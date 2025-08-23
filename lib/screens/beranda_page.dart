@@ -5,7 +5,6 @@ import 'package:alhamra_1/providers/auth_provider.dart';
 import 'package:alhamra_1/services/berita_service.dart';
 import 'package:alhamra_1/services/santri_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:alhamra_1/utils/app_styles.dart';
 import 'package:alhamra_1/widgets/child_info_card.dart';
