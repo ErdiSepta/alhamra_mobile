@@ -24,8 +24,19 @@ class _OnboardScreenState extends State<OnboardScreen> {
           ClipPath(
             clipper: OnboardClipper(),
             child: Container(
-              color: const Color(0xFF00BFA5),
               height: AppStyles.getResponsiveHeight(context, 0.5),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [AppStyles.primaryColor, AppStyles.secondaryColor],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                image: const DecorationImage(
+                  image: AssetImage('assets/gambar/overlay.png'),
+                  fit: BoxFit.cover,
+                  opacity: 0.4,
+                ),
+              ),
             ),
           ),
           // PageView for onboarding content
@@ -148,7 +159,7 @@ class _OnboardScreenState extends State<OnboardScreen> {
                             ),
                       decoration: BoxDecoration(
                         color: _currentPage == index
-                            ? const Color(0xFF00BFA5)
+                            ? AppStyles.primaryColor
                             : Colors.grey.shade300,
                         borderRadius: BorderRadius.circular(4),
                       ),
@@ -190,8 +201,8 @@ class _OnboardScreenState extends State<OnboardScreen> {
                                   AppStyles.getCardBorderRadius(context),
                                 ),
                               ),
-                              side: const BorderSide(
-                                color: Color(0xFF00BFA5),
+                              side: BorderSide(
+                                color: AppStyles.primaryColor,
                                 width: 0.5,
                               ),
                               padding: EdgeInsets.symmetric(
@@ -212,7 +223,7 @@ class _OnboardScreenState extends State<OnboardScreen> {
                             child: Text(
                               'Kembali',
                               style: GoogleFonts.poppins(
-                                color: const Color(0xFF00BFA5),
+                                color: AppStyles.primaryColor,
                                 fontSize: AppStyles.getResponsiveFontSize(
                                   context,
                                   small: 14.0,
@@ -241,7 +252,7 @@ class _OnboardScreenState extends State<OnboardScreen> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF00BFA5),
+                        backgroundColor: AppStyles.primaryColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(
                             AppStyles.getCardBorderRadius(context),

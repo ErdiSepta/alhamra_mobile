@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../utils/app_styles.dart';
 
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
@@ -33,7 +34,7 @@ class CustomTextField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Color(0xFF00BFA5), width: 2),
+          borderSide: BorderSide(color: AppStyles.primaryColor, width: 2),
         ),
         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
         suffixIcon: suffixIcon,

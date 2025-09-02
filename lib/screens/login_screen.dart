@@ -55,9 +55,9 @@ class _LoginScreenState extends State<LoginScreen> {
             end: Alignment.bottomRight,
           ),
           image: DecorationImage(
-            image: AssetImage('assets/gambar/loginoverlay.png'),
+            image: AssetImage('assets/gambar/overlay.png'),
             fit: BoxFit.cover,
-            opacity: 0.4,
+            opacity: 0.3,
           ),
         ),
         child: Column(
@@ -65,11 +65,11 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             Container(
               constraints: BoxConstraints(
-                maxHeight: AppStyles.getResponsiveHeight(context, 0.18),
-                maxWidth: AppStyles.getResponsiveWidth(context, 0.6),
+                maxHeight: AppStyles.getResponsiveHeight(context, 0.25),
+                maxWidth: AppStyles.getResponsiveWidth(context, 0.8),
               ),
               child: Image.asset(
-                'assets/logo/logoalhamra.png',
+                'assets/logo/splashscreen.png',
                 fit: BoxFit.contain,
               ),
             ),
@@ -81,11 +81,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 large: 12.0,
               ),
             ),
-            Text('IBS AL - HAMRA', style: AppStyles.heading1(context)),
-            Text(
-              'Islamic Boarding School',
-              style: AppStyles.subheading(context),
-            ),
+            // Text('IBS AL - HAMRA', style: AppStyles.heading1(context)),
+            // Text(
+            //   'Islamic Boarding School',
+            //   style: AppStyles.subheading(context),
+            // ),
           ],
         ),
       ),

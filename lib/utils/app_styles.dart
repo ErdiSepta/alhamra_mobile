@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppStyles {
-  // Colors
-  static const Color primaryColor = Color.fromARGB(255, 11, 95, 212);
-  static const Color secondaryColor = Color.fromARGB(255, 10, 115, 196);
+  // Colors - Updated to match blue gradient design
+  static const Color primaryColor = Color(0xFF288DE5); // Light blue from gradient
+  static const Color secondaryColor = Color(0xFF164E7F); // Dark blue from gradient
   static const Color accentColor = Color(0xFFFFC107);
   static const Color whiteColor = Color(0xFFFFFFFF);
   static const Color blackColor = Color(0xFF000000);

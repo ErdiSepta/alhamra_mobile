@@ -126,7 +126,7 @@ class _BerandaPageState extends State<BerandaPage> {
                           ? null
                           : const DecorationImage(
                               image: AssetImage(
-                                'assets/gambar/background_beranda.png',
+                                'assets/gambar/overlay.png',
                               ),
                               fit: BoxFit.cover,
                               opacity: 0.6,
@@ -211,10 +211,10 @@ class _BerandaPageState extends State<BerandaPage> {
               SliverToBoxAdapter(
                 child: Column(
                   children: [
-                    // Green Container with Saldo Card
-                    _buildGreenContainer(context),
+                    // Blue Container with Saldo Card
+                    _buildBlueContainer(context),
 
-                    // Spacing between green section and menu
+                    // Spacing between blue section and menu
                     const SizedBox(height: 20),
 
                     // Menu Section
@@ -237,12 +237,12 @@ class _BerandaPageState extends State<BerandaPage> {
     );
   }
 
-  Widget _buildGreenContainer(BuildContext context) {
+  Widget _buildBlueContainer(BuildContext context) {
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('assets/gambar/background_beranda.png'),
+          image: AssetImage('assets/gambar/overlay.png'),
           fit: BoxFit.cover,
           opacity: 1,
         ),
@@ -254,12 +254,12 @@ class _BerandaPageState extends State<BerandaPage> {
           top: 6.0,
           bottom: 30.0,
         ),
-        child: _buildSaldoCardInGreen(context),
+        child: _buildSaldoCardInBlue(context),
       ),
     );
   }
 
-  Widget _buildSaldoCardInGreen(BuildContext context) {
+  Widget _buildSaldoCardInBlue(BuildContext context) {
     return ChildInfoCard(
       currentSantri: _currentSantri,
       allSantri: _santriList,
@@ -393,10 +393,6 @@ class _BerandaPageState extends State<BerandaPage> {
   }
 
   Widget _buildMenuItem(Map<String, dynamic> item) {
-    const Color tealColor = Color(
-      0xFF4DD0E1,
-    ); // Teal/turquoise color from the design
-
     return InkWell(
       onTap: () {
         print('Menu ${item['label']} pressed');
@@ -412,18 +408,13 @@ class _BerandaPageState extends State<BerandaPage> {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: const Color.fromARGB(
-                  255,
-                  15,
-                  215,
-                  152,
-                ).withOpacity(0.15),
+                color: AppStyles.primaryColor.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Center(
                 child: Icon(
                   item['icon'] as IconData,
-                  color: tealColor,
+                  color: AppStyles.primaryColor,
                   size: 27,
                 ),
               ),
