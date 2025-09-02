@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class UserModel {
   final String uid;
   final String fullName;
@@ -7,7 +5,7 @@ class UserModel {
   final String phoneNumber;
   final String address;
   final String email;
-  final Timestamp? lastLogin;
+  final DateTime? lastLogin;
   final List<String> santriIds;
 
   UserModel({
@@ -29,8 +27,20 @@ class UserModel {
       phoneNumber: data['nomorHp'] ?? '',
       address: data['alamatLengkap'] ?? '',
       email: data['emailPengguna'] ?? '',
-      lastLogin: data['lastLogin'],
+      lastLogin: data['lastLogin'] != null ? DateTime.parse(data['lastLogin']) : null,
       santriIds: List<String>.from(data['santriIds'] ?? []),
     );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'namaLengkap': fullName,
+      'jenisKelamin': gender,
+      'nomorHp': phoneNumber,
+      'alamatLengkap': address,
+      'emailPengguna': email,
+      'lastLogin': lastLogin?.toIso8601String(),
+      'santriIds': santriIds,
+    };
   }
 }

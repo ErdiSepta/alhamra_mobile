@@ -684,7 +684,7 @@ class _BerandaPageState extends State<BerandaPage> {
                               children: [
                                 Text(
                                   DateFormat('EEEE, d MMMM yyyy', 'id_ID')
-                                      .format(berita.publishedAt.toDate()),
+                                      .format(berita.publishedAt),
                                   style: GoogleFonts.poppins(
                                     color: Colors.grey[500],
                                     fontSize: 11,

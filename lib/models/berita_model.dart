@@ -1,12 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class Berita {
   final String id;
   final String title;
   final String content;
   final String imageUrl;
   final String thumbnailUrl;
-  final Timestamp publishedAt;
+  final DateTime publishedAt;
   final String? author;
 
   Berita({
@@ -25,21 +23,22 @@ class Berita {
       'content': content,
       'imageUrl': imageUrl,
       'thumbnailUrl': thumbnailUrl,
-      'publishedAt': publishedAt,
+      'publishedAt': publishedAt.toIso8601String(),
       'author': author,
     };
   }
 
-  factory Berita.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
-    Map<String, dynamic>? data = doc.data();
+  factory Berita.fromMap(Map<String, dynamic> data, String id) {
     return Berita(
-      id: doc.id,
-      title: data?['title'] ?? '',
-      content: data?['content'] ?? '',
-      imageUrl: data?['imageUrl'] ?? '',
-      thumbnailUrl: data?['thumbnailUrl'] ?? '',
-      publishedAt: data?['publishedAt'] ?? Timestamp.now(),
-      author: data?['author'],
+      id: id,
+      title: data['title'] ?? '',
+      content: data['content'] ?? '',
+      imageUrl: data['imageUrl'] ?? '',
+      thumbnailUrl: data['thumbnailUrl'] ?? '',
+      publishedAt: data['publishedAt'] != null 
+          ? DateTime.parse(data['publishedAt']) 
+          : DateTime.now(),
+      author: data['author'],
     );
   }
 }

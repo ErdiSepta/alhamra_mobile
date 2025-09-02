@@ -1,11 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class Santri {
   final String id;
   final String namaLengkap;
   final String namaPanggilan;
   final String tempatLahir;
-  final Timestamp tanggalLahir;
+  final DateTime tanggalLahir;
   final String jenisKelamin;
   final String? fotoUrl;
 
@@ -19,14 +17,15 @@ class Santri {
     this.fotoUrl,
   });
 
-  factory Santri.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
-    Map<String, dynamic> data = doc.data()!;
+  factory Santri.fromMap(Map<String, dynamic> data, String id) {
     return Santri(
-      id: doc.id,
+      id: id,
       namaLengkap: data['namaLengkap'] ?? '',
       namaPanggilan: data['namaPanggilan'] ?? '',
       tempatLahir: data['tempatLahir'] ?? '',
-      tanggalLahir: data['tanggalLahir'] ?? Timestamp.now(),
+      tanggalLahir: data['tanggalLahir'] != null 
+          ? DateTime.parse(data['tanggalLahir']) 
+          : DateTime.now(),
       jenisKelamin: data['jenisKelamin'] ?? '',
       fotoUrl: data['fotoUrl'],
     );
@@ -37,7 +36,7 @@ class Santri {
       'namaLengkap': namaLengkap,
       'namaPanggilan': namaPanggilan,
       'tempatLahir': tempatLahir,
-      'tanggalLahir': tanggalLahir,
+      'tanggalLahir': tanggalLahir.toIso8601String(),
       'jenisKelamin': jenisKelamin,
       'fotoUrl': fotoUrl,
     };

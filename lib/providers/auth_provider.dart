@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:alhamra_1/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -35,9 +34,9 @@ class AuthProvider extends ChangeNotifier {
     final userId = prefs.getString(_userKey);
 
     if (userId != null) {
-      final firebaseUser = _authService.getCurrentUser();
-      if (firebaseUser != null && firebaseUser.uid == userId) {
-        _user = await _authService.getUserData(firebaseUser.uid);
+      final currentUser = _authService.getCurrentUser();
+      if (currentUser != null && currentUser.uid == userId) {
+        _user = await _authService.getUserData(currentUser.uid);
         if (_user != null) {
           _status = AuthStatus.authenticated;
         } else {
@@ -46,7 +45,7 @@ class AuthProvider extends ChangeNotifier {
           _status = AuthStatus.unauthenticated;
         }
       } else {
-        // Mismatch or no Firebase user, clear session
+        // Mismatch or no current user, clear session
         await logout();
         _status = AuthStatus.unauthenticated;
       }
@@ -58,6 +57,9 @@ class AuthProvider extends ChangeNotifier {
 
   Future<bool> login(String email, String password) async {
     try {
+      _status = AuthStatus.authenticating;
+      notifyListeners();
+
       final credential = await _authService.signInWithEmailAndPassword(
         email,
         password,
@@ -78,7 +80,7 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
       return false;
     } catch (e) {
-      _errorMessage = "Email dan password tidak terdaftar";
+      _errorMessage = e.toString();
       _status = AuthStatus.unauthenticated;
       notifyListeners();
       return false;
