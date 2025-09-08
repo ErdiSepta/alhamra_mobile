@@ -2,14 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:alhamra_1/services/seeder_service.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'providers/auth_provider.dart';
-import 'screens/splash_screen.dart';
-import 'screens/onboard_screen.dart';
-import 'screens/login_screen.dart';
-import 'screens/home_screen.dart';
-import 'utils/app_styles.dart';
+import 'core/services/seeder_service.dart';
+import 'core/providers/auth_provider.dart';
+import 'core/utils/app_styles.dart';
+import 'app/config/routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -55,13 +52,8 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
-        initialRoute: '/',
-        routes: {
-          '/': (context) => const SplashScreen(),
-          '/onboard': (context) => const OnboardScreen(),
-          '/login': (context) => const LoginScreen(),
-          '/home': (context) => const HomeScreen(),
-        },
+        initialRoute: AppRoutes.splash,
+        routes: AppRoutes.routes,
       ),
     );
   }

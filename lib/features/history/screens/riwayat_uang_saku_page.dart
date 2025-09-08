@@ -1,0 +1,17 @@
+import 'package:flutter/material.dart';
+
+class RiwayatUangSakuPage extends StatelessWidget {
+  const RiwayatUangSakuPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Riwayat Uang Saku'),
+      ),
+      body: const Center(
+        child: Text('Riwayat Uang Saku Page'),
+      ),
+    );
+  }
+}
