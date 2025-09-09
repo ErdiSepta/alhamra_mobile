@@ -4,6 +4,9 @@ import '../../../features/payment/screens/standalone_pembayaran_page.dart';
 import '../../../features/notifications/screens/pemberitahuan_page.dart';
 import '../../../features/payment/screens/status_berhasil_page.dart';
 import '../../../core/services/notification_service.dart';
+import '../../history/screens/riwayat_tagihan_page.dart';
+import '../../history/screens/riwayat_uang_saku_page.dart';
+import '../../history/screens/riwayat_dompet_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
@@ -477,7 +480,9 @@ class _BerandaPageState extends State<BerandaPage> {
                 );
               },
               () {
-                // Navigate to billing history page
+                Navigator.of(context, rootNavigator: true).push(
+                  MaterialPageRoute(builder: (context) => const RiwayatTagihanPage()),
+                );
               },
             ),
           ),
@@ -503,7 +508,9 @@ class _BerandaPageState extends State<BerandaPage> {
                 );
               },
               () {
-                // Navigate to pocket money history page
+                Navigator.of(context, rootNavigator: true).push(
+                  MaterialPageRoute(builder: (context) => const RiwayatUangSakuPage()),
+                );
               },
             ),
           ),
@@ -525,7 +532,9 @@ class _BerandaPageState extends State<BerandaPage> {
               'Riwayat Dompet',
               () {},
               () {
-                // Navigate to wallet history page
+                Navigator.of(context, rootNavigator: true).push(
+                  MaterialPageRoute(builder: (context) => const RiwayatDompetPage()),
+                );
               },
             ),
           ),
