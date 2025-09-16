@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../../core/utils/app_styles.dart';
-import '../../shared/widgets/custom_app_bar.dart';
-import '../../../core/models/pocket_money_history.dart';
+import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:google_fonts/google_fonts.dart';
+
+import '../../../core/models/pocket_money_history.dart';
+import '../../../core/utils/app_styles.dart';
+import '../../shared/widgets/history_filter_widget.dart';
+import 'detail_uang_saku_page.dart';
 
 class RiwayatUangSakuPage extends StatefulWidget {
   const RiwayatUangSakuPage({super.key});
@@ -12,16 +14,25 @@ class RiwayatUangSakuPage extends StatefulWidget {
   State<RiwayatUangSakuPage> createState() => _RiwayatUangSakuPageState();
 }
 
-class _RiwayatUangSakuPageState extends State<RiwayatUangSakuPage> with SingleTickerProviderStateMixin {
+class _RiwayatUangSakuPageState extends State<RiwayatUangSakuPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
   String _selectedPeriod = 'Bulan Ini';
   String _selectedCategory = 'Pemasukan';
-  
-  // Filter state variables from notification system
+
+  // Filter state variables
   String _selectedSortOrder = 'Terbaru';
   DateTime? _startDate;
   DateTime? _endDate;
+
+  // Category filters for pocket money
+  final Map<String, bool> _categoryFilters = {
+    'Top Up': true,
+    'Pembelian': true,
+    'Transfer': true,
+    'Penarikan': true,
+  };
 
   // Dummy data untuk riwayat uang saku
   final List<PocketMoneyHistory> _allTransactions = [
@@ -41,7 +52,7 @@ class _RiwayatUangSakuPageState extends State<RiwayatUangSakuPage> with SingleTi
       amount: 25000,
       date: DateTime(2025, 7, 21, 13, 30),
       type: PocketMoneyTransactionType.outgoing,
-      bankName: 'Bank Mandiri',
+      bankName: 'Uang Saku',
     ),
     PocketMoneyHistory(
       id: 'US-003',
@@ -54,48 +65,21 @@ class _RiwayatUangSakuPageState extends State<RiwayatUangSakuPage> with SingleTi
     ),
     PocketMoneyHistory(
       id: 'US-004',
-      title: 'Beli Alat Tulis',
-      subtitle: 'Toko Buku Pesantren',
-      amount: 45000,
-      date: DateTime(2025, 7, 19, 16, 45),
+      title: 'Pembelian Buku',
+      subtitle: 'Toko Buku Al-Ikhlas',
+      amount: 75000,
+      date: DateTime(2025, 7, 19, 15, 0),
       type: PocketMoneyTransactionType.outgoing,
-      bankName: 'Bank Mandiri',
+      bankName: 'Uang Saku',
     ),
     PocketMoneyHistory(
       id: 'US-005',
-      title: 'Dana Masuk Dari',
-      subtitle: 'Muhammad Ilham',
-      amount: 300000,
-      date: DateTime(2025, 7, 18, 14, 20),
-      type: PocketMoneyTransactionType.incoming,
-      bankName: 'Bank Mandiri',
-    ),
-    PocketMoneyHistory(
-      id: 'US-006',
-      title: 'Laundry Pakaian',
-      subtitle: 'Laundry Pesantren',
-      amount: 15000,
-      date: DateTime(2025, 7, 17, 11, 10),
+      title: 'Penarikan Tunai',
+      subtitle: 'ATM Sekolah',
+      amount: 100000,
+      date: DateTime(2025, 7, 18, 11, 45),
       type: PocketMoneyTransactionType.outgoing,
-      bankName: 'Bank Mandiri',
-    ),
-    PocketMoneyHistory(
-      id: 'US-007',
-      title: 'Snack & Minuman',
-      subtitle: 'Warung Pak Haji',
-      amount: 35000,
-      date: DateTime(2025, 7, 16, 19, 30),
-      type: PocketMoneyTransactionType.outgoing,
-      bankName: 'Bank Mandiri',
-    ),
-    PocketMoneyHistory(
-      id: 'US-008',
-      title: 'Dana Masuk Dari',
-      subtitle: 'Muhammad Ilham',
-      amount: 200000,
-      date: DateTime(2025, 7, 15, 9, 0),
-      type: PocketMoneyTransactionType.incoming,
-      bankName: 'Bank Mandiri',
+      bankName: 'Uang Saku',
     ),
   ];
 
@@ -122,10 +106,24 @@ class _RiwayatUangSakuPageState extends State<RiwayatUangSakuPage> with SingleTi
     return Theme(
       data: themed,
       child: Scaffold(
-        backgroundColor: Colors.grey[50],
-        appBar: CustomAppBar(
-          title: 'Riwayat Uang Saku',
+        backgroundColor: Colors.white,
+        appBar: AppBar(
           backgroundColor: AppStyles.primaryColor,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: const Text(
+            'Riwayat Uang Saku',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'Poppins',
+            ),
+          ),
+          centerTitle: true,
         ),
         body: Column(
           children: [
@@ -137,16 +135,16 @@ class _RiwayatUangSakuPageState extends State<RiwayatUangSakuPage> with SingleTi
                 labelColor: AppStyles.primaryColor,
                 unselectedLabelColor: Colors.grey[600],
                 indicatorColor: AppStyles.primaryColor,
-                indicatorWeight: 3,
+                indicatorWeight: 2,
                 labelStyle: const TextStyle(
                   fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w600,
                   fontSize: 16,
+                  fontWeight: FontWeight.w600,
                 ),
                 unselectedLabelStyle: const TextStyle(
                   fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
                   fontSize: 16,
+                  fontWeight: FontWeight.w400,
                 ),
                 tabs: const [
                   Tab(text: 'Pemasukan'),
@@ -157,8 +155,8 @@ class _RiwayatUangSakuPageState extends State<RiwayatUangSakuPage> with SingleTi
             ),
             // Filter Section
             Container(
-              color: Colors.white,
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              color: Colors.grey[50],
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -167,45 +165,45 @@ class _RiwayatUangSakuPageState extends State<RiwayatUangSakuPage> with SingleTi
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey[700],
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[800],
                     ),
                   ),
-                  GestureDetector(
-                    onTap: _showFilterDialog,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+                  Row(
+                    children: [
+                      Text(
+                        _selectedSortOrder,
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[600],
+                        ),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Filter',
-                            style: GoogleFonts.poppins(
-                              color: AppStyles.primaryColor,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
+                      const SizedBox(width: 16),
+                      GestureDetector(
+                        onTap: _showFilterDialog,
+                        child: Row(
+                          children: [
+                            Text(
+                              'Filter',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: AppStyles.primaryColor,
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 4),
-                          Icon(
-                            Icons.tune,
-                            color: AppStyles.primaryColor,
-                            size: 16,
-                          ),
-                        ],
+                            const SizedBox(width: 6),
+                            Icon(
+                              Icons.tune,
+                              size: 18,
+                              color: AppStyles.primaryColor,
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ],
               ),
@@ -215,8 +213,12 @@ class _RiwayatUangSakuPageState extends State<RiwayatUangSakuPage> with SingleTi
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  _buildTransactionList(_getFilteredTransactions().where((t) => t.type == PocketMoneyTransactionType.incoming).toList()),
-                  _buildTransactionList(_getFilteredTransactions().where((t) => t.type == PocketMoneyTransactionType.outgoing).toList()),
+                  _buildTransactionList(_getFilteredTransactions()
+                      .where((t) => t.type == PocketMoneyTransactionType.incoming)
+                      .toList()),
+                  _buildTransactionList(_getFilteredTransactions()
+                      .where((t) => t.type == PocketMoneyTransactionType.outgoing)
+                      .toList()),
                   _buildReportTab(), // Laporan dengan chart
                 ],
               ),
@@ -265,94 +267,107 @@ class _RiwayatUangSakuPageState extends State<RiwayatUangSakuPage> with SingleTi
   }
 
   Widget _buildTransactionItem(PocketMoneyHistory transaction) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+    final isTopUp = transaction.type == PocketMoneyTransactionType.incoming;
+    final color = isTopUp ? AppStyles.primaryColor : Colors.pink[300];
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailUangSakuPage(transaction: transaction),
           ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Icon
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: Colors.pink[50],
-              borderRadius: BorderRadius.circular(12),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
-            child: Icon(
-              Icons.account_balance_wallet_outlined,
-              color: Colors.pink[300],
-              size: 24,
+          ],
+        ),
+        child: Row(
+          children: [
+            // Icon
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: color?.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                isTopUp ? Icons.arrow_downward : Icons.arrow_upward,
+                color: color,
+                size: 24,
+              ),
             ),
-          ),
-          const SizedBox(width: 16),
-          // Content
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  transaction.title,
-                  style: const TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+            const SizedBox(width: 16),
+            // Content
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    transaction.title,
+                    style: const TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  transaction.subtitle,
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey[600],
+                  const SizedBox(height: 2),
+                  Text(
+                    transaction.subtitle,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey[600],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  transaction.bankName,
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey[500],
+                  const SizedBox(height: 4),
+                  Text(
+                    transaction.bankName,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.grey[500],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  transaction.formattedDateTime,
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey[500],
+                  const SizedBox(height: 2),
+                  Text(
+                    DateFormat('d MMMM yyyy, HH:mm', 'id_ID').format(transaction.date),
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.grey[500],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          // Amount
-          Text(
-            transaction.formattedAmount,
-            style: const TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
+            // Amount
+            Text(
+              '${isTopUp ? '+' : '-'}Rp${NumberFormat.decimalPattern('id_ID').format(transaction.amount)}',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -415,7 +430,7 @@ class _RiwayatUangSakuPageState extends State<RiwayatUangSakuPage> with SingleTi
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Rp. 354.000',
+                  'Rp. 1.500.000', // Example data
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 24,
@@ -454,7 +469,7 @@ class _RiwayatUangSakuPageState extends State<RiwayatUangSakuPage> with SingleTi
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '+Rp.1.250.000',
+                            '+Rp.1.700.000', // Example data
                             style: TextStyle(
                               fontFamily: 'Poppins',
                               fontSize: 14,
@@ -493,7 +508,7 @@ class _RiwayatUangSakuPageState extends State<RiwayatUangSakuPage> with SingleTi
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '-Rp.250.000',
+                            '-Rp.200.000', // Example data
                             style: TextStyle(
                               fontFamily: 'Poppins',
                               fontSize: 14,
@@ -512,7 +527,7 @@ class _RiwayatUangSakuPageState extends State<RiwayatUangSakuPage> with SingleTi
           const SizedBox(height: 24),
           
           // Doughnut Chart
-          Container(
+          SizedBox(
             height: 200,
             child: SfCircularChart(
               margin: EdgeInsets.zero,
@@ -524,7 +539,7 @@ class _RiwayatUangSakuPageState extends State<RiwayatUangSakuPage> with SingleTi
                   pointColorMapper: (ChartData data, _) => data.color,
                   innerRadius: '70%',
                   radius: '90%',
-                  dataLabelSettings: DataLabelSettings(
+                  dataLabelSettings: const DataLabelSettings(
                     isVisible: false,
                   ),
                 ),
@@ -535,7 +550,7 @@ class _RiwayatUangSakuPageState extends State<RiwayatUangSakuPage> with SingleTi
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        '25%',
+                        '12%', // Example data
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 24,
@@ -650,10 +665,10 @@ class _RiwayatUangSakuPageState extends State<RiwayatUangSakuPage> with SingleTi
             },
             child: Column(
               key: ValueKey(_selectedCategory),
-              children: (_selectedCategory == 'Pemasukan' 
-                  ? _getFilteredTransactions().where((t) => t.type == PocketMoneyTransactionType.incoming).take(2)
-                  : _getFilteredTransactions().where((t) => t.type == PocketMoneyTransactionType.outgoing).take(2)
-              ).map((transaction) {
+              children: (_selectedCategory == 'Pemasukan'
+                      ? _allTransactions.where((t) => t.type == PocketMoneyTransactionType.incoming).take(2)
+                      : _allTransactions.where((t) => t.type == PocketMoneyTransactionType.outgoing).take(2))
+                  .map((transaction) {
                 return Container(
                   margin: const EdgeInsets.only(bottom: 12),
                   child: _buildTransactionItem(transaction),
@@ -699,331 +714,113 @@ class _RiwayatUangSakuPageState extends State<RiwayatUangSakuPage> with SingleTi
     String tempSortOrder = _selectedSortOrder;
     DateTime? tempStartDate = _startDate;
     DateTime? tempEndDate = _endDate;
+    Map<String, bool> tempCategoryFilters = Map.from(_categoryFilters);
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            return Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(24),
-                  topRight: Radius.circular(24),
-                ),
-              ),
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Filter Riwayat',
-                        style: GoogleFonts.poppins(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.close),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  
-                  // Sort Order Section
-                  Text(
-                    'Urutkan Berdasarkan Waktu',
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildSortButton(
-                          'Terbaru',
-                          tempSortOrder == 'Terbaru',
-                          () {
-                            setModalState(() {
-                              tempSortOrder = 'Terbaru';
-                            });
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildSortButton(
-                          'Terlama',
-                          tempSortOrder == 'Terlama',
-                          () {
-                            setModalState(() {
-                              tempSortOrder = 'Terlama';
-                            });
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  
-                  // Date Range Section
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Dari',
-                              style: GoogleFonts.poppins(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            _buildDatePicker(
-                              tempStartDate,
-                              'Pilih Tanggal Awal',
-                              (date) {
-                                setModalState(() {
-                                  tempStartDate = date;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Sampai',
-                              style: GoogleFonts.poppins(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            _buildDatePicker(
-                              tempEndDate,
-                              'Pilih Tanggal Akhir',
-                              (date) {
-                                setModalState(() {
-                                  tempEndDate = date;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 32),
-                  
-                  // Action Buttons
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () {
-                            setState(() {
-                              _selectedSortOrder = 'Terbaru';
-                              _startDate = null;
-                              _endDate = null;
-                            });
-                            Navigator.pop(context);
-                          },
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: AppStyles.primaryColor),
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: Text(
-                            'Atur Ulang',
-                            style: GoogleFonts.poppins(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: AppStyles.primaryColor,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              _selectedSortOrder = tempSortOrder;
-                              _startDate = tempStartDate;
-                              _endDate = tempEndDate;
-                            });
-                            Navigator.pop(context);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppStyles.primaryColor,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: Text(
-                            'Terapkan',
-                            style: GoogleFonts.poppins(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildSortButton(String label, bool isSelected, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected ? AppStyles.primaryColor : Colors.transparent,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: isSelected ? AppStyles.primaryColor : Colors.grey.shade300,
-          ),
-        ),
-        child: Center(
-          child: Text(
-            label,
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: isSelected ? Colors.white : Colors.grey.shade600,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDatePicker(DateTime? selectedDate, String placeholder, Function(DateTime?) onDateSelected) {
-    return GestureDetector(
-      onTap: () async {
-        final DateTime? picked = await showDatePicker(
-          context: context,
-          initialDate: selectedDate ?? DateTime.now(),
-          firstDate: DateTime(2020),
-          lastDate: DateTime.now().add(const Duration(days: 365)),
-          builder: (context, child) {
-            return Theme(
-              data: Theme.of(context).copyWith(
-                colorScheme: ColorScheme.light(
-                  primary: AppStyles.primaryColor,
-                ),
-              ),
-              child: child!,
-            );
-          },
-        );
-        if (picked != null) {
-          onDateSelected(picked);
-        }
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                selectedDate != null
-                    ? '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}'
-                    : placeholder,
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: selectedDate != null ? Colors.black87 : Colors.grey.shade500,
-                ),
-              ),
-            ),
-            Icon(
-              Icons.calendar_today,
-              size: 16,
-              color: Colors.grey.shade500,
-            ),
-          ],
-        ),
+      builder: (context) => HistoryFilterWidget(
+        selectedSortOrder: tempSortOrder,
+        startDate: tempStartDate,
+        endDate: tempEndDate,
+        categoryFilters: tempCategoryFilters,
+        availableCategories: _categoryFilters.keys.toList(),
+        onSortOrderChanged: (sortOrder) {
+          tempSortOrder = sortOrder;
+        },
+        onStartDateChanged: (startDate) {
+          tempStartDate = startDate;
+        },
+        onEndDateChanged: (endDate) {
+          tempEndDate = endDate;
+        },
+        onCategoryFiltersChanged: (categoryFilters) {
+          tempCategoryFilters = categoryFilters;
+        },
+        onApply: () {
+          setState(() {
+            _selectedSortOrder = tempSortOrder;
+            _startDate = tempStartDate;
+            _endDate = tempEndDate;
+            _categoryFilters.clear();
+            _categoryFilters.addAll(tempCategoryFilters);
+          });
+          Navigator.pop(context);
+        },
+        onReset: () {
+          setState(() {
+            _selectedSortOrder = 'Terbaru';
+            _startDate = null;
+            _endDate = null;
+            _categoryFilters.updateAll((key, value) => true);
+          });
+        },
+        title: 'Filter Riwayat Uang Saku',
       ),
     );
   }
 
   List<PocketMoneyHistory> _getFilteredTransactions() {
     List<PocketMoneyHistory> filtered = List.from(_allTransactions);
-    
+
     // Filter by date range
     if (_startDate != null || _endDate != null) {
       filtered = filtered.where((transaction) {
         final transactionDate = transaction.date;
-        
+
         if (_startDate != null && _endDate != null) {
           return transactionDate.isAfter(_startDate!.subtract(const Duration(days: 1))) &&
-                 transactionDate.isBefore(_endDate!.add(const Duration(days: 1)));
+              transactionDate.isBefore(_endDate!.add(const Duration(days: 1)));
         } else if (_startDate != null) {
           return transactionDate.isAfter(_startDate!.subtract(const Duration(days: 1)));
         } else if (_endDate != null) {
           return transactionDate.isBefore(_endDate!.add(const Duration(days: 1)));
         }
-        
+
         return true;
       }).toList();
     }
-    
+
+    // Filter by category
+    filtered = filtered.where((transaction) {
+      String category = _getTransactionCategory(transaction);
+      return _categoryFilters[category] == true;
+    }).toList();
+
     // Sort by date
     if (_selectedSortOrder == 'Terbaru') {
       filtered.sort((a, b) => b.date.compareTo(a.date));
     } else {
       filtered.sort((a, b) => a.date.compareTo(b.date));
     }
-    
+
     return filtered;
   }
 
+  String _getTransactionCategory(PocketMoneyHistory transaction) {
+    switch (transaction.type) {
+      case PocketMoneyTransactionType.incoming:
+        return 'Top Up';
+      case PocketMoneyTransactionType.outgoing:
+        if (transaction.title.toLowerCase().contains('pembelian')) {
+          return 'Pembelian';
+        }
+        if (transaction.title.toLowerCase().contains('transfer')) {
+          return 'Transfer';
+        }
+        if (transaction.title.toLowerCase().contains('penarikan')) {
+          return 'Penarikan';
+        }
+        return 'Lainnya';
+    }
+  }
+
   List<ChartData> _getChartData() {
+    // Example data
     return [
-      ChartData('Pemasukan', 75, AppStyles.primaryColor),
-      ChartData('Pengeluaran', 25, Colors.pink[300]!),
+      ChartData('Pemasukan', 88, AppStyles.primaryColor),
+      ChartData('Pengeluaran', 12, Colors.pink[300]!),
     ];
   }
 }

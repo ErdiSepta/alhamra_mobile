@@ -13,6 +13,8 @@ class AppStyles {
   static const Color lightGreyColor = Color(0xFF9E9E9E);
   static const Color greyColor = Color(0xFFF5F5F5);
   static const Color choco = Color.fromARGB(255, 108, 102, 98);
+  // Default red for danger/error states
+  static const Color dangerColor = Color(0xFFEE6868);
 
   // Responsive utilities
   static double getScreenWidth(BuildContext context) {

@@ -1,16 +1,49 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import '../../../core/utils/app_styles.dart';
 import '../../shared/widgets/custom_app_bar.dart';
 import '../../../core/models/bill.dart';
-import '../../payment/screens/status_menunggu_page.dart';
+import '../../../core/data/student_data.dart';
+import 'bayar_pages.dart';
+import 'custom_status_menunggu_page.dart';
 
-class PembayaranConfirmPage extends StatelessWidget {
+class PembayaranConfirmPage extends StatefulWidget {
   const PembayaranConfirmPage({super.key, required this.bills});
   final List<Bill> bills;
 
-  int get total => bills.fold(0, (prev, b) => prev + b.outstanding);
+  @override
+  State<PembayaranConfirmPage> createState() => _PembayaranConfirmPageState();
+}
+
+class _PembayaranConfirmPageState extends State<PembayaranConfirmPage> {
+  late TextEditingController _amountController;
+  late int _total;
+  int _enteredAmount = 0;
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _total = widget.bills.fold(0, (prev, b) => prev + b.outstanding);
+    _amountController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _amountController.dispose();
+    super.dispose();
+  }
+
+  String _formatCurrency(int amount, {bool includeSymbol = true}) {
+    final format = NumberFormat.decimalPattern('id_ID');
+    return (includeSymbol ? 'Rp ' : '') + format.format(amount);
+  }
+
+  String _rupiah(int amount) {
+    return _formatCurrency(amount);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,60 +56,78 @@ class PembayaranConfirmPage extends StatelessWidget {
       data: themed,
       child: Scaffold(
         appBar: const CustomAppBar(title: 'Konfirmasi Pembayaran'),
-        body: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildSummaryCard(context),
-              const SizedBox(height: 16),
-              _buildBillsCard(context),
-              const SizedBox(height: 16),
-              _buildMethodCard(context),
-              const Spacer(),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: bills.isEmpty
-                      ? null
-                      : () async {
-                          final confirm = await showDialog<bool>(
-                            context: context,
-                            builder: (ctx) => AlertDialog(
-                              title: const Text('Konfirmasi'),
-                              content: Text('Buat kode bayar untuk total ' + _rupiah(total) + '?'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.of(ctx).pop(false),
-                                  child: const Text('Batal'),
-                                ),
-                                ElevatedButton(
-                                  onPressed: () => Navigator.of(ctx).pop(true),
-                                  child: const Text('Ya, Lanjut'),
-                                ),
-                              ],
-                            ),
-                          );
-                          if (confirm == true) {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => PembayaranPaymentPage(amount: total),
+        body: Form(
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSummaryCard(context),
+                const SizedBox(height: 16),
+                _buildAmountInputCard(context),
+                const SizedBox(height: 16),
+                _buildBillsCard(context),
+                const SizedBox(height: 16),
+                _buildMethodCard(context),
+                const Spacer(),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: widget.bills.isEmpty
+                        ? null
+                        : () async {
+                            if (!_formKey.currentState!.validate()) {
+                              return;
+                            }
+                            final amountToPay = _enteredAmount;
+
+                            final confirm = await showDialog<bool>(
+                              context: context,
+                              builder: (ctx) => AlertDialog(
+                                title: const Text('Konfirmasi'),
+                                content: Text(
+                                    'Buat kode bayar untuk total ${_rupiah(amountToPay)}?'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(ctx).pop(false),
+                                    child: const Text('Batal'),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () =>
+                                        Navigator.of(ctx).pop(true),
+                                    child: const Text('Ya, Lanjut'),
+                                  ),
+                                ],
                               ),
                             );
-                          }
-                        },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppStyles.primaryColor,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    disabledBackgroundColor: Colors.grey.shade300,
-                    disabledForegroundColor: Colors.grey.shade600,
+                            if (confirm == true) {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      PembayaranPaymentPage(
+                                        amount: amountToPay,
+                                        bills: widget.bills,
+                                      ),
+                                ),
+                              );
+                            }
+                          },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppStyles.primaryColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      disabledBackgroundColor: Colors.grey.shade300,
+                      disabledForegroundColor: Colors.grey.shade600,
+                    ),
+                    child: const Text('Buat Kode Bayar'),
                   ),
-                  child: const Text('Buat Kode Bayar'),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -113,12 +164,111 @@ class PembayaranConfirmPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Total Pembayaran', style: AppStyles.bodyText(context).copyWith(color: Colors.black54)),
+                Text('Total Tagihan',
+                    style: AppStyles.bodyText(context)
+                        .copyWith(color: Colors.black54)),
                 const SizedBox(height: 4),
-                Text(_rupiah(total), style: AppStyles.saldoValue(context).copyWith(fontSize: 20)),
+                Text(_rupiah(_total),
+                    style: AppStyles.saldoValue(context).copyWith(fontSize: 20)),
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAmountInputCard(BuildContext context) {
+    final remaining = _total - _enteredAmount;
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextFormField(
+            controller: _amountController,
+            style: AppStyles.bodyText(context)
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+            keyboardType:
+                const TextInputType.numberWithOptions(decimal: false),
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            decoration: InputDecoration(
+              labelText: 'Masukan Nominal Bayar',
+              labelStyle:
+                  AppStyles.bodyText(context).copyWith(color: Colors.black54),
+              prefixText: 'Rp ',
+              prefixStyle: AppStyles.bodyText(context)
+                  .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+              border: const OutlineInputBorder(),
+              focusedBorder: OutlineInputBorder(
+                borderSide:
+                    BorderSide(color: AppStyles.primaryColor, width: 2),
+              ),
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Nominal tidak boleh kosong';
+              }
+              final amount = int.tryParse(value.replaceAll('.', ''));
+              if (amount == null) {
+                return 'Format nominal salah';
+              }
+              if (amount <= 0) {
+                return 'Nominal harus lebih dari 0';
+              }
+              if (amount > _total) {
+                return 'Tidak boleh melebihi total tagihan';
+              }
+              return null;
+            },
+            onChanged: (value) {
+              String cleanValue = value.replaceAll('.', '');
+              if (cleanValue.isEmpty) {
+                setState(() {
+                  _enteredAmount = 0;
+                });
+                return;
+              }
+              int amount = int.tryParse(cleanValue) ?? 0;
+              setState(() {
+                _enteredAmount = amount;
+              });
+              String formatted =
+                  _formatCurrency(amount, includeSymbol: false);
+              if (value != formatted) {
+                _amountController.value = TextEditingValue(
+                  text: formatted,
+                  selection:
+                      TextSelection.collapsed(offset: formatted.length),
+                );
+              }
+            },
+          ),
+          if (_enteredAmount > 0) ...[
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Sisa Pembayaran', style: AppStyles.bodyText(context)),
+                Text(
+                  _rupiah(remaining < 0 ? 0 : remaining),
+                  style: AppStyles.bodyText(context)
+                      .copyWith(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ]
         ],
       ),
     );
@@ -143,22 +293,25 @@ class PembayaranConfirmPage extends StatelessWidget {
         children: [
           Text(
             'Rincian Tagihan',
-            style: AppStyles.bodyText(context).copyWith(fontWeight: FontWeight.w600, color: Colors.black),
+            style: AppStyles.bodyText(context)
+                .copyWith(fontWeight: FontWeight.w600, color: Colors.black),
           ),
           const SizedBox(height: 8),
-          ...bills.map((b) => Padding(
+          ...widget.bills.map((b) => Padding(
                 padding: const EdgeInsets.symmetric(vertical: 6),
                 child: Row(
                   children: [
                     Expanded(
                       child: Text(
                         b.title,
-                        style: AppStyles.bodyText(context).copyWith(color: Colors.black87),
+                        style: AppStyles.bodyText(context)
+                            .copyWith(color: Colors.black87),
                       ),
                     ),
                     Text(
                       _rupiah(b.outstanding),
-                      style: AppStyles.bodyText(context).copyWith(fontWeight: FontWeight.w600),
+                      style: AppStyles.bodyText(context)
+                          .copyWith(fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
@@ -167,9 +320,12 @@ class PembayaranConfirmPage extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text('Total', style: AppStyles.bodyText(context).copyWith(fontWeight: FontWeight.w600, color: Colors.black)),
+                child: Text('Total',
+                    style: AppStyles.bodyText(context).copyWith(
+                        fontWeight: FontWeight.w600, color: Colors.black)),
               ),
-              Text(_rupiah(total), style: AppStyles.saldoValue(context).copyWith(fontSize: 18)),
+              Text(_rupiah(_total),
+                  style: AppStyles.saldoValue(context).copyWith(fontSize: 18)),
             ],
           ),
         ],
@@ -195,16 +351,25 @@ class PembayaranConfirmPage extends StatelessWidget {
         children: [
           CircleAvatar(
             backgroundColor: AppStyles.primaryColor.withOpacity(0.1),
-            child: const Icon(Icons.account_balance, color: AppStyles.primaryColor),
+            child:
+                const Icon(Icons.account_balance, color: AppStyles.primaryColor),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text('BSI Virtual Account', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black)),
-                SizedBox(height: 2),
-                Text('Pembayaran dicek otomatis'),
+              children: [
+                Text(
+                  'BSI Virtual Account',
+                  style: AppStyles.bodyText(context)
+                      .copyWith(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Pembayaran akan dicek otomatis',
+                  style: AppStyles.bodyText(context)
+                      .copyWith(fontSize: 12, color: Colors.black54),
+                ),
               ],
             ),
           ),
@@ -212,17 +377,12 @@ class PembayaranConfirmPage extends StatelessWidget {
       ),
     );
   }
-
-  static String _rupiah(int amount) {
-    final s = amount.toString();
-    final reg = RegExp(r'\B(?=(\d{3})+(?!\d))');
-    return 'Rp ' + s.replaceAllMapped(reg, (m) => '.');
-  }
 }
 
 class PembayaranPaymentPage extends StatefulWidget {
-  const PembayaranPaymentPage({super.key, required this.amount});
+  const PembayaranPaymentPage({super.key, required this.amount, required this.bills});
   final int amount;
+  final List<Bill> bills;
 
   @override
   State<PembayaranPaymentPage> createState() => _PembayaranPaymentPageState();
@@ -536,9 +696,25 @@ class _PembayaranPaymentPageState extends State<PembayaranPaymentPage> {
                   ),
                 );
                 if (confirm == true) {
-                  Navigator.of(context).push(
+                  // Create payment data for the custom status page
+                  final paymentData = PaymentData(
+                    bills: widget.bills,
+                    studentName: StudentData.defaultStudent, // You can make this dynamic based on selected student
+                    paymentMethod: 'BSI Virtual Account',
+                    virtualAccount: _vaNumber,
+                    totalAmount: widget.amount,
+                    paymentDate: DateTime.now(),
+                    invoiceId: 'INV/${DateTime.now().millisecondsSinceEpoch}',
+                    senderName: 'Idris Nur Wahyudi', // You can make this dynamic
+                    administrator: 'Diah Al Quwari',
+                  );
+                  
+                  // Navigate to custom status menunggu page
+                  Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
-                      builder: (_) => StatusMenungguPage(amount: widget.amount),
+                      builder: (context) => CustomStatusMenungguPage(
+                        paymentData: paymentData,
+                      ),
                     ),
                   );
                 }

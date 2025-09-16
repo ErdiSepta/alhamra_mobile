@@ -121,20 +121,17 @@ class BillCard extends StatelessWidget {
     late Color fg;
     late String label;
     switch (status) {
+      case BillStatus.pending:
       case BillStatus.unpaid:
-        bg = Colors.orange.withOpacity(0.15);
-        fg = Colors.orange.shade800;
-        label = 'Belum Bayar';
-        break;
       case BillStatus.partial:
-        bg = Colors.blue.withOpacity(0.15);
-        fg = Colors.blue.shade800;
-        label = 'Terbayar Sebagian';
+        bg = AppStyles.dangerColor.withOpacity(0.12);
+        fg = AppStyles.dangerColor;
+        label = 'Menunggu';
         break;
       case BillStatus.paid:
         bg = Colors.green.withOpacity(0.15);
         fg = Colors.green.shade800;
-        label = 'Lunas';
+        label = 'Terkonfirmasi';
         break;
     }
     return Container(

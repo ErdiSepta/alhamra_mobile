@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../core/utils/app_styles.dart';
 import '../../../core/models/wallet_history.dart';
-import '../../shared/widgets/custom_app_bar.dart';
+import '../../shared/widgets/index.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'detail_dompet_page.dart';
 
 class RiwayatDompetPage extends StatefulWidget {
   const RiwayatDompetPage({super.key});
@@ -17,6 +18,18 @@ class _RiwayatDompetPageState extends State<RiwayatDompetPage> with SingleTicker
   String _selectedPeriod = 'Bulan Ini';
   String _selectedCategory = 'Pemasukan';
   final TextEditingController _searchController = TextEditingController();
+  
+  // Filter state variables
+  String _selectedSortOrder = 'Terbaru';
+  DateTime? _startDate;
+  DateTime? _endDate;
+  
+  // Category filters for wallet transactions
+  final Map<String, bool> _categoryFilters = {
+    'Top Up': true,
+    'Pembayaran': true,
+    'Transfer': true,
+  };
 
   // Dummy data untuk riwayat dompet
   final List<WalletHistory> _allTransactions = [
@@ -117,14 +130,28 @@ class _RiwayatDompetPageState extends State<RiwayatDompetPage> with SingleTicker
     return Theme(
       data: themed,
       child: Scaffold(
-        backgroundColor: Colors.grey[50],
-        appBar: CustomAppBar(
-          title: 'Riwayat Dompet',
+        backgroundColor: Colors.white,
+        appBar: AppBar(
           backgroundColor: AppStyles.primaryColor,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: const Text(
+            'Riwayat Dompet',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'Poppins',
+            ),
+          ),
+          centerTitle: true,
         ),
         body: Column(
           children: [
-            // Tab Bar
+            // Tab Bar (standardized like Riwayat Tagihan)
             Container(
               color: Colors.white,
               child: TabBar(
@@ -132,16 +159,16 @@ class _RiwayatDompetPageState extends State<RiwayatDompetPage> with SingleTicker
                 labelColor: AppStyles.primaryColor,
                 unselectedLabelColor: Colors.grey[600],
                 indicatorColor: AppStyles.primaryColor,
-                indicatorWeight: 3,
+                indicatorWeight: 2,
                 labelStyle: const TextStyle(
                   fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w600,
                   fontSize: 16,
+                  fontWeight: FontWeight.w600,
                 ),
                 unselectedLabelStyle: const TextStyle(
                   fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
                   fontSize: 16,
+                  fontWeight: FontWeight.w400,
                 ),
                 tabs: const [
                   Tab(text: 'Pemasukan'),
@@ -152,8 +179,8 @@ class _RiwayatDompetPageState extends State<RiwayatDompetPage> with SingleTicker
             ),
             // Filter Section
             Container(
-              color: Colors.white,
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              color: Colors.grey[50],
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -162,35 +189,45 @@ class _RiwayatDompetPageState extends State<RiwayatDompetPage> with SingleTicker
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey[700],
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[800],
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _showFilter = !_showFilter;
-                      });
-                    },
-                    child: Row(
-                      children: [
-                        Text(
-                          'Filter',
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: AppStyles.primaryColor,
-                          ),
+                  Row(
+                    children: [
+                      Text(
+                        _selectedSortOrder,
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[600],
                         ),
-                        const SizedBox(width: 4),
-                        Icon(
-                          Icons.tune,
-                          color: AppStyles.primaryColor,
-                          size: 20,
+                      ),
+                      const SizedBox(width: 16),
+                      GestureDetector(
+                        onTap: _showFilterDialog,
+                        child: Row(
+                          children: [
+                            Text(
+                              'Filter',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: AppStyles.primaryColor,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Icon(
+                              Icons.tune,
+                              size: 18,
+                              color: AppStyles.primaryColor,
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -200,8 +237,8 @@ class _RiwayatDompetPageState extends State<RiwayatDompetPage> with SingleTicker
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  _buildTransactionList(_allTransactions.where((t) => t.isPositive).toList()),
-                  _buildTransactionList(_allTransactions.where((t) => !t.isPositive).toList()),
+                  _buildTransactionList(_getFilteredTransactions().where((t) => t.isPositive).toList()),
+                  _buildTransactionList(_getFilteredTransactions().where((t) => !t.isPositive).toList()),
                   _buildReportTab(), // Laporan dengan chart
                 ],
               ),
@@ -250,21 +287,30 @@ class _RiwayatDompetPageState extends State<RiwayatDompetPage> with SingleTicker
   }
 
   Widget _buildTransactionItem(WalletHistory transaction) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailDompetPage(transaction: transaction),
           ),
-        ],
-      ),
-      child: Row(
-        children: [
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
           // Icon
           Container(
             width: 48,
@@ -337,7 +383,8 @@ class _RiwayatDompetPageState extends State<RiwayatDompetPage> with SingleTicker
               color: Colors.black87,
             ),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -691,6 +738,108 @@ class _RiwayatDompetPageState extends State<RiwayatDompetPage> with SingleTicker
         ),
       ),
     );
+  }
+
+
+  void _showFilterDialog() {
+    String tempSortOrder = _selectedSortOrder;
+    DateTime? tempStartDate = _startDate;
+    DateTime? tempEndDate = _endDate;
+    Map<String, bool> tempCategoryFilters = Map.from(_categoryFilters);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => HistoryFilterWidget(
+        selectedSortOrder: tempSortOrder,
+        startDate: tempStartDate,
+        endDate: tempEndDate,
+        categoryFilters: tempCategoryFilters,
+        availableCategories: _categoryFilters.keys.toList(),
+        onSortOrderChanged: (sortOrder) {
+          tempSortOrder = sortOrder;
+        },
+        onStartDateChanged: (startDate) {
+          tempStartDate = startDate;
+        },
+        onEndDateChanged: (endDate) {
+          tempEndDate = endDate;
+        },
+        onCategoryFiltersChanged: (categoryFilters) {
+          tempCategoryFilters = categoryFilters;
+        },
+        onApply: () {
+          setState(() {
+            _selectedSortOrder = tempSortOrder;
+            _startDate = tempStartDate;
+            _endDate = tempEndDate;
+            _categoryFilters.clear();
+            _categoryFilters.addAll(tempCategoryFilters);
+          });
+          Navigator.pop(context);
+        },
+        onReset: () {
+          setState(() {
+            _selectedSortOrder = 'Terbaru';
+            _startDate = null;
+            _endDate = null;
+            _categoryFilters.updateAll((key, value) => true);
+          });
+        },
+        title: 'Filter Riwayat Dompet',
+      ),
+    );
+  }
+
+  List<WalletHistory> _getFilteredTransactions() {
+    List<WalletHistory> filtered = List.from(_allTransactions);
+    
+    // Filter by date range
+    if (_startDate != null || _endDate != null) {
+      filtered = filtered.where((transaction) {
+        final transactionDate = transaction.date;
+        
+        if (_startDate != null && _endDate != null) {
+          return transactionDate.isAfter(_startDate!.subtract(const Duration(days: 1))) &&
+                 transactionDate.isBefore(_endDate!.add(const Duration(days: 1)));
+        } else if (_startDate != null) {
+          return transactionDate.isAfter(_startDate!.subtract(const Duration(days: 1)));
+        } else if (_endDate != null) {
+          return transactionDate.isBefore(_endDate!.add(const Duration(days: 1)));
+        }
+        
+        return true;
+      }).toList();
+    }
+    
+    // Filter by category
+    filtered = filtered.where((transaction) {
+      String category = _getTransactionCategory(transaction);
+      return _categoryFilters[category] == true;
+    }).toList();
+    
+    // Sort by date
+    if (_selectedSortOrder == 'Terbaru') {
+      filtered.sort((a, b) => b.date.compareTo(a.date));
+    } else {
+      filtered.sort((a, b) => a.date.compareTo(b.date));
+    }
+    
+    return filtered;
+  }
+
+  String _getTransactionCategory(WalletHistory transaction) {
+    switch (transaction.type) {
+      case WalletTransactionType.topup:
+        return 'Top Up';
+      case WalletTransactionType.payment:
+        return 'Pembayaran';
+      case WalletTransactionType.transfer:
+        return 'Transfer';
+      default:
+        return 'Lainnya';
+    }
   }
 
   List<ChartData> _getChartData() {

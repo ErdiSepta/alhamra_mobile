@@ -1,5 +1,6 @@
 import '../../../features/topup/screens/topup_page.dart';
 import '../../../core/utils/app_styles.dart';
+import '../../../core/data/student_data.dart';
 import '../../../features/payment/screens/standalone_pembayaran_page.dart';
 import '../../../features/notifications/screens/pemberitahuan_page.dart';
 import '../../../features/payment/screens/status_berhasil_page.dart';
@@ -7,6 +8,8 @@ import '../../../core/services/notification_service.dart';
 import '../../history/screens/riwayat_tagihan_page.dart';
 import '../../history/screens/riwayat_uang_saku_page.dart';
 import '../../history/screens/riwayat_dompet_page.dart';
+import '../../shared/widgets/index.dart';
+import '../../shared/widgets/student_selection_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
@@ -21,23 +24,13 @@ class BerandaPage extends StatefulWidget {
 class _BerandaPageState extends State<BerandaPage> {
   final PageController _pageController = PageController(viewportFraction: 0.9);
   int _currentPage = 0;
-  bool _isOverlayVisible = false;
   final ScrollController _scrollController = ScrollController();
   bool _isAppBarLight = false;
 
   // Santri selection state
-  String _selectedSantri = 'Naufal Ramadhan';
-  final TextEditingController _santriSearchController = TextEditingController();
-  final List<String> _allSantri = [
-    'Naufal Ramadhan',
-    'Santri 2',
-    'Ahmad Fauzi',
-    'Budi Santoso',
-    'Siti Aisyah',
-    'Nurul Huda',
-    'Rahmat Hidayat',
-  ];
-  List<String> _filteredSantri = [];
+  String _selectedSantri = StudentData.defaultStudent;
+  final List<String> _allSantri = StudentData.allStudents;
+  bool _isStudentOverlayVisible = false;
 
   // Saldo amounts
   String _amountTagihan = 'Rp 2.345.000';
@@ -66,7 +59,6 @@ class _BerandaPageState extends State<BerandaPage> {
         });
       }
     });
-    _filteredSantri = List.from(_allSantri);
   }
 
   @override
@@ -74,17 +66,12 @@ class _BerandaPageState extends State<BerandaPage> {
     _pageController.dispose();
     _scrollController.dispose();
     _refreshTimer?.cancel();
-    _santriSearchController.dispose();
     super.dispose();
   }
 
-  void _toggleOverlay() {
+  void _onSantriChanged(String santri) {
     setState(() {
-      _isOverlayVisible = !_isOverlayVisible;
-      if (_isOverlayVisible) {
-        _santriSearchController.clear();
-        _filteredSantri = List.from(_allSantri);
-      }
+      _selectedSantri = santri;
     });
   }
 
@@ -241,216 +228,51 @@ class _BerandaPageState extends State<BerandaPage> {
                 ],
               ),
             ),
-            if (_isOverlayVisible) _buildOverlay(),
+            // Add overlay at the top level to ensure it appears above all content
+            if (_isStudentOverlayVisible)
+              SearchOverlayWidget(
+                isVisible: _isStudentOverlayVisible,
+                title: 'Pilih Santri',
+                items: _allSantri,
+                selectedItem: _selectedSantri,
+                onItemSelected: (santri) {
+                  setState(() {
+                    _selectedSantri = santri;
+                    _isStudentOverlayVisible = false;
+                  });
+                },
+                onClose: () {
+                  setState(() {
+                    _isStudentOverlayVisible = false;
+                  });
+                },
+                searchHint: 'Cari santri...',
+                avatarUrl: StudentData.defaultAvatarUrl,
+              ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTopSection() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
-      decoration: BoxDecoration(
-        color: AppStyles.primaryColor,
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(30),
-          bottomRight: Radius.circular(30),
-        ),
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              const CircleAvatar(
-                radius: 25,
-                backgroundImage: NetworkImage(
-                  'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                ),
-              ),
-              const SizedBox(width: 15),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Assalamualaikum,',
-                    style: AppStyles.headerGreeting(context).copyWith(
-                      color: _isAppBarLight ? Colors.black : Colors.white,
-                    ),
-                  ),
-                  Text(
-                    'Muhammad Faithfullah Ilhamy Azda',
-                    style: AppStyles.headerUsername(context).copyWith(
-                      color: _isAppBarLight ? Colors.black : Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-              const Spacer(),
-              Stack(
-                children: [
-                  Icon(
-                    Icons.notifications_none,
-                    color: _isAppBarLight
-                        ? AppStyles.primaryColor
-                        : Colors.white,
-                    size: 30,
-                  ),
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    child: Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      constraints: const BoxConstraints(
-                        minWidth: 12,
-                        minHeight: 12,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildSantriSelector() {
-    return GestureDetector(
-      onTap: _toggleOverlay,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.2),
-                spreadRadius: 2,
-                blurRadius: 5,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              const CircleAvatar(
-                radius: 20,
-                backgroundImage: NetworkImage(
-                  'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                ),
-              ),
-              const SizedBox(width: 15),
-              Text(_selectedSantri, style: AppStyles.cardUsername(context)),
-              const Spacer(),
-              Text(
-                'Ganti',
-                style: AppStyles.bodyText(
-                  context,
-                ).copyWith(color: AppStyles.primaryColor),
-              ),
-              const SizedBox(width: 5),
-              const Icon(
-                Icons.swap_horiz,
-                color: AppStyles.primaryColor,
-                size: 20,
-              ),
-            ],
-          ),
-        ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: StudentSelectionWidget(
+        selectedStudent: _selectedSantri,
+        students: _allSantri,
+        onStudentChanged: _onSantriChanged,
+        onOverlayVisibilityChanged: (visible) {
+          setState(() {
+            _isStudentOverlayVisible = visible;
+          });
+        },
+        avatarUrl: StudentData.defaultAvatarUrl,
       ),
     );
   }
 
-  Widget _buildOverlay() {
-    return GestureDetector(
-      onTap: _toggleOverlay,
-      child: Container(
-        color: Colors.black.withOpacity(0.5),
-        child: Center(
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.9,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'Pilih Santri',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: _santriSearchController,
-                  decoration: const InputDecoration(
-                    hintText: 'Cari santri...',
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(),
-                    isDense: true,
-                  ),
-                  onChanged: (q) {
-                    final query = q.toLowerCase();
-                    setState(() {
-                      _filteredSantri = _allSantri
-                          .where((s) => s.toLowerCase().contains(query))
-                          .toList();
-                    });
-                  },
-                ),
-                const SizedBox(height: 12),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxHeight: 300),
-                  child: _filteredSantri.isEmpty
-                      ? const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 24.0),
-                          child: Text('Tidak ada santri'),
-                        )
-                      : ListView.separated(
-                          shrinkWrap: true,
-                          itemCount: _filteredSantri.length,
-                          separatorBuilder: (_, __) => const Divider(height: 1),
-                          itemBuilder: (context, index) {
-                            final name = _filteredSantri[index];
-                            return ListTile(
-                              leading: const CircleAvatar(
-                                backgroundImage: NetworkImage(
-                                  'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                                ),
-                              ),
-                              title: Text(name),
-                              trailing: name == _selectedSantri
-                                  ? const Icon(
-                                      Icons.check,
-                                      color: AppStyles.primaryColor,
-                                    )
-                                  : null,
-                              onTap: () {
-                                setState(() {
-                                  _selectedSantri = name;
-                                  _isOverlayVisible = false;
-                                });
-                              },
-                            );
-                          },
-                        ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _buildInfoCarousel() {
     return SizedBox(
@@ -468,21 +290,29 @@ class _BerandaPageState extends State<BerandaPage> {
             builder: (context, scale, child) {
               return Transform.scale(scale: scale, child: child);
             },
-            child: _buildInfoCard(
-              'Total Tagihan',
-              _amountTagihan,
-              'Bayar',
-              Icons.payment,
-              'Riwayat Tagihan',
-              () {
+            child: InfoCardWidget(
+              title: 'Total Tagihan',
+              amount: _amountTagihan,
+              buttonText: 'Bayar',
+              buttonIcon: Icons.payment,
+              historyText: 'Riwayat Tagihan',
+              onButtonPressed: () {
                 Navigator.of(context, rootNavigator: true).push(
                   MaterialPageRoute(builder: (context) => const StandalonePembayaranPage()),
                 );
               },
-              () {
+              onHistoryPressed: () {
                 Navigator.of(context, rootNavigator: true).push(
                   MaterialPageRoute(builder: (context) => const RiwayatTagihanPage()),
                 );
+              },
+              onRefresh: _triggerRefresh,
+              isRefreshing: _isRefreshing,
+              isAmountHidden: _saldoHidden,
+              onToggleVisibility: () {
+                setState(() {
+                  _saldoHidden = !_saldoHidden;
+                });
               },
             ),
           ),
@@ -496,21 +326,29 @@ class _BerandaPageState extends State<BerandaPage> {
             builder: (context, scale, child) {
               return Transform.scale(scale: scale, child: child);
             },
-            child: _buildInfoCard(
-              'Total Uang Saku',
-              _amountUangSaku,
-              'Top Up',
-              Icons.add_circle_outline,
-              'Riwayat Uang Saku',
-              () {
+            child: InfoCardWidget(
+              title: 'Total Uang Saku',
+              amount: _amountUangSaku,
+              buttonText: 'Top Up',
+              buttonIcon: Icons.add_circle_outline,
+              historyText: 'Riwayat Uang Saku',
+              onButtonPressed: () {
                 Navigator.of(context, rootNavigator: true).push(
                   MaterialPageRoute(builder: (context) => const TopUpPage()),
                 );
               },
-              () {
+              onHistoryPressed: () {
                 Navigator.of(context, rootNavigator: true).push(
                   MaterialPageRoute(builder: (context) => const RiwayatUangSakuPage()),
                 );
+              },
+              onRefresh: _triggerRefresh,
+              isRefreshing: _isRefreshing,
+              isAmountHidden: _saldoHidden,
+              onToggleVisibility: () {
+                setState(() {
+                  _saldoHidden = !_saldoHidden;
+                });
               },
             ),
           ),
@@ -524,17 +362,22 @@ class _BerandaPageState extends State<BerandaPage> {
             builder: (context, scale, child) {
               return Transform.scale(scale: scale, child: child);
             },
-            child: _buildInfoCard(
-              'Total Saldo Dompet',
-              _amountDompet,
-              '',
-              null,
-              'Riwayat Dompet',
-              () {},
-              () {
+            child: InfoCardWidget(
+              title: 'Total Saldo Dompet',
+              amount: _amountDompet,
+              historyText: 'Riwayat Dompet',
+              onHistoryPressed: () {
                 Navigator.of(context, rootNavigator: true).push(
                   MaterialPageRoute(builder: (context) => const RiwayatDompetPage()),
                 );
+              },
+              onRefresh: _triggerRefresh,
+              isRefreshing: _isRefreshing,
+              isAmountHidden: _saldoHidden,
+              onToggleVisibility: () {
+                setState(() {
+                  _saldoHidden = !_saldoHidden;
+                });
               },
             ),
           ),
@@ -562,139 +405,6 @@ class _BerandaPageState extends State<BerandaPage> {
     );
   }
 
-  String _displayAmount(String amount) {
-    if (_isRefreshing) {
-      final dots = '.' * ((_ellipsisStep % 3) + 1);
-      return 'Rp ' + dots;
-    }
-    return _saldoHidden ? '••••••••' : amount;
-  }
-
-  Widget _buildInfoCard(
-    String title,
-    String amount,
-    String buttonText,
-    IconData? icon,
-    String historyText,
-    VoidCallback onButtonPressed,
-    VoidCallback onHistoryPressed,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      margin: const EdgeInsets.symmetric(horizontal: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(title, style: AppStyles.saldoLabel(context)),
-              GestureDetector(
-                onTap: _triggerRefresh,
-                child: Row(
-                  children: [
-                    Text(
-                      'Segarkan',
-                      style: AppStyles.bodyText(
-                        context,
-                      ).copyWith(color: AppStyles.primaryColor),
-                    ),
-                    const SizedBox(width: 5),
-                    const Icon(
-                      Icons.sync,
-                      color: AppStyles.primaryColor,
-                      size: 16,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 5),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    _displayAmount(amount),
-                    style: AppStyles.saldoValue(context),
-                  ),
-                  const SizedBox(width: 10),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _saldoHidden = !_saldoHidden;
-                      });
-                    },
-                    child: Icon(
-                      _saldoHidden
-                          ? Icons.visibility_off_outlined
-                          : Icons.visibility_outlined,
-                      color: AppStyles.lightGreyColor,
-                      size: 20,
-                    ),
-                  ),
-                ],
-              ),
-              if (buttonText.isNotEmpty)
-                GestureDetector(
-                  onTap: onButtonPressed,
-                  child: Column(
-                    children: [
-                      Icon(icon, color: AppStyles.primaryColor, size: 24),
-                      const SizedBox(height: 4),
-                      Text(buttonText, style: AppStyles.topUpButton(context)),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-          const Spacer(),
-          const Divider(),
-          GestureDetector(
-            onTap: onHistoryPressed,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.history,
-                      color: AppStyles.primaryColor,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      historyText,
-                      style: AppStyles.transactionHistory(context),
-                    ),
-                  ],
-                ),
-                const Icon(
-                  Icons.arrow_forward_ios,
-                  color: AppStyles.primaryColor,
-                  size: 16,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildBottomContent() {
     return Container(
@@ -884,4 +594,3 @@ class _BerandaPageState extends State<BerandaPage> {
     );
   }
 }
-

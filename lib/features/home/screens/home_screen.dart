@@ -1,6 +1,5 @@
-import 'package:alhamra_1/features/home/screens/beranda_page.dart';
-import 'package:alhamra_1/features/payment/screens/pembayaran_page.dart';
-import 'package:alhamra_1/features/payment/screens/status_page.dart';
+import 'package:alhamra_1/features/home/screens/menu_pages.dart';
+import 'package:alhamra_1/features/payment/screens/bayar_pages.dart';
 import 'package:alhamra_1/features/profile/screens/profil_page.dart';
 
 import '../../../core/utils/app_styles.dart';
@@ -12,7 +11,7 @@ import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 class PlaceholderPage extends StatelessWidget {
   final String title;
   final IconData icon;
-  
+
   const PlaceholderPage({super.key, required this.title, required this.icon});
 
   @override
@@ -23,11 +22,7 @@ class PlaceholderPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              size: 80,
-              color: AppStyles.primaryColor,
-            ),
+            Icon(icon, size: 80, color: AppStyles.primaryColor),
             const SizedBox(height: 20),
             Text(
               '$title Page',
@@ -40,10 +35,7 @@ class PlaceholderPage extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               'This page is under construction',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                color: Colors.grey[600],
-              ),
+              style: GoogleFonts.poppins(fontSize: 16, color: Colors.grey[600]),
             ),
           ],
         ),
@@ -58,14 +50,22 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Set default to index 2 (Beranda - center item)
-    PersistentTabController controller = PersistentTabController(initialIndex: 2);
+    PersistentTabController controller = PersistentTabController(
+      initialIndex: 2,
+    );
 
     List<Widget> buildScreens() {
       return [
-        const PlaceholderPage(title: 'Menu', icon: Icons.menu),
-        PembayaranPage(), // Bayar
-        const BerandaPage(), // Beranda (center)
-        StatusPage(), // Status
+        const BerandaPage(), // Menu (now shows Beranda content)
+        const StatusPage(), // Bayar
+        const PlaceholderPage(
+          title: 'Beranda',
+          icon: Icons.menu,
+        ), // Beranda (center) now empty
+        const PlaceholderPage(
+          title: 'Status',
+          icon: Icons.history_outlined,
+        ), // Status
         ProfilPage(), // Akun
       ];
     }
@@ -74,7 +74,7 @@ class HomeScreen extends StatelessWidget {
       return [
         // Menu
         PersistentBottomNavBarItem(
-          icon: const Icon(Icons.menu, size: 26),
+          icon: const Icon(Icons.home, size: 26),
           title: "Menu",
           activeColorPrimary: AppStyles.primaryColor,
           inactiveColorPrimary: const Color(0xFFAAAAAA),
@@ -85,8 +85,8 @@ class HomeScreen extends StatelessWidget {
         ),
         // Bayar
         PersistentBottomNavBarItem(
-          icon: const Icon(Icons.payment_outlined, size: 26),
-          title: "Bayar",
+          icon: const Icon(Icons.history_outlined, size: 26),
+          title: "Status",
           activeColorPrimary: AppStyles.primaryColor,
           inactiveColorPrimary: const Color(0xFFAAAAAA),
           textStyle: GoogleFonts.poppins(
@@ -96,7 +96,7 @@ class HomeScreen extends StatelessWidget {
         ),
         // Beranda (Center - Default)
         PersistentBottomNavBarItem(
-          icon: const Icon(Icons.home, size: 26),
+          icon: const Icon(Icons.menu, size: 26),
           title: "Beranda",
           activeColorPrimary: AppStyles.primaryColor,
           inactiveColorPrimary: const Color(0xFFAAAAAA),
@@ -107,8 +107,8 @@ class HomeScreen extends StatelessWidget {
         ),
         // Status
         PersistentBottomNavBarItem(
-          icon: const Icon(Icons.history_outlined, size: 26),
-          title: "Status",
+          icon: const Icon(Icons.local_activity, size: 26),
+          title: "Aktivitas",
           activeColorPrimary: AppStyles.primaryColor,
           inactiveColorPrimary: const Color(0xFFAAAAAA),
           textStyle: GoogleFonts.poppins(
@@ -166,4 +166,3 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
-

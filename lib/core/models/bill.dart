@@ -1,10 +1,9 @@
-import 'package:flutter/foundation.dart';
 
 /// Status tagihan
 /// - unpaid: Belum Bayar
 /// - partial: Terbayar Sebagian
 /// - paid: Lunas
-enum BillStatus { unpaid, partial, paid }
+enum BillStatus { pending, unpaid, partial, paid }
 
 /// Model data Tagihan untuk integrasi API.
 /// Pisahkan state UI (mis. selected) dari model ini.
@@ -91,6 +90,9 @@ class Bill {
 
   static BillStatus _statusFromString(String s) {
     switch (s.toLowerCase()) {
+      case 'pending':
+      case 'menunggu':
+        return BillStatus.pending;
       case 'unpaid':
       case 'belum_bayar':
       case 'belum bayar':
@@ -109,6 +111,8 @@ class Bill {
 
   static String _statusToString(BillStatus status) {
     switch (status) {
+      case BillStatus.pending:
+        return 'pending';
       case BillStatus.unpaid:
         return 'unpaid';
       case BillStatus.partial:

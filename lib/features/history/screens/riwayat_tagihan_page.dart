@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../../core/utils/app_styles.dart';
 import '../../../core/models/bill.dart';
-import '../../shared/widgets/custom_app_bar.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'detail_tagihan_page.dart';
+import '../../shared/widgets/history_filter_widget.dart';
 
 class RiwayatTagihanPage extends StatefulWidget {
   const RiwayatTagihanPage({super.key});
@@ -12,98 +12,65 @@ class RiwayatTagihanPage extends StatefulWidget {
   State<RiwayatTagihanPage> createState() => _RiwayatTagihanPageState();
 }
 
-class _RiwayatTagihanPageState extends State<RiwayatTagihanPage> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  String _selectedPeriod = 'Bulan Ini';
-  String _selectedCategory = 'Pemasukan';
+class _RiwayatTagihanPageState extends State<RiwayatTagihanPage> {
   
-  // Filter state variables from notification system
+  // Filter state variables
   String _selectedSortOrder = 'Terbaru';
   DateTime? _startDate;
   DateTime? _endDate;
-  final TextEditingController _searchController = TextEditingController();
-  bool _showFilter = false;
-
-  // Dummy data untuk riwayat tagihan
+  final Map<String, bool> _categoryFilters = {
+    'SPP': true,
+    'Seragam': true,
+    'Makan': true,
+    'Buku': true,
+    'Kegiatan': true,
+    'Lainnya': true,
+  };
+  
+  // Sample bill data with varied content
   final List<Bill> _allBills = [
     Bill(
-      id: 'TGH-001',
-      title: 'Dana Masuk Dari',
-      subtitle: 'Muhammad Ilham',
+      id: 'INV/083/329382',
+      title: 'Seragam Sekolah XL Kelas 12',
+      subtitle: 'Tenggat Bayar : 22 Juli 2025, 23:59 WIB',
       amount: 1200000,
-      dueDate: DateTime(2025, 7, 22, 12, 9),
+      dueDate: DateTime(2025, 7, 22, 23, 59),
       status: BillStatus.paid,
       period: 'Juli 2025',
     ),
     Bill(
-      id: 'TGH-002',
-      title: 'Pembayaran SPP',
-      subtitle: 'November 2024',
-      amount: 350000,
-      dueDate: DateTime(2025, 7, 21, 14, 30),
-      status: BillStatus.paid,
-      period: 'November 2024',
+      id: 'INV/084/329383',
+      title: 'SPP Bulan Agustus 2025',
+      subtitle: 'Tenggat Bayar : 15 Agustus 2025, 23:59 WIB',
+      amount: 850000,
+      dueDate: DateTime(2025, 8, 15, 23, 59),
+      status: BillStatus.unpaid,
+      period: 'Agustus 2025',
     ),
     Bill(
-      id: 'TGH-003',
-      title: 'Dana Masuk Dari',
-      subtitle: 'Muhammad Ilham',
-      amount: 800000,
-      dueDate: DateTime(2025, 7, 20, 10, 15),
-      status: BillStatus.paid,
-      period: 'Juli 2025',
-    ),
-    Bill(
-      id: 'TGH-004',
-      title: 'Biaya Makan',
-      subtitle: 'Oktober 2024',
+      id: 'INV/085/329384',
+      title: 'Makan Siang Bulan Juli',
+      subtitle: 'Tenggat Bayar : 30 Juli 2025, 23:59 WIB',
       amount: 450000,
-      dueDate: DateTime(2025, 7, 19, 16, 45),
-      status: BillStatus.paid,
-      period: 'Oktober 2024',
-    ),
-    Bill(
-      id: 'TGH-005',
-      title: 'Dana Masuk Dari',
-      subtitle: 'Muhammad Ilham',
-      amount: 600000,
-      dueDate: DateTime(2025, 7, 18, 14, 20),
+      dueDate: DateTime(2025, 7, 30, 23, 59),
       status: BillStatus.paid,
       period: 'Juli 2025',
     ),
     Bill(
-      id: 'TGH-006',
-      title: 'Biaya Seragam',
-      subtitle: 'September 2024',
-      amount: 275000,
-      dueDate: DateTime(2025, 7, 17, 11, 10),
-      status: BillStatus.paid,
-      period: 'September 2024',
+      id: 'INV/086/329385',
+      title: 'Buku Pelajaran Semester 1',
+      subtitle: 'Tenggat Bayar : 10 Agustus 2025, 23:59 WIB',
+      amount: 750000,
+      dueDate: DateTime(2025, 8, 10, 23, 59),
+      status: BillStatus.unpaid,
+      period: 'Agustus 2025',
     ),
     Bill(
-      id: 'TGH-004',
-      title: 'Dana Masuk Dari',
-      subtitle: 'Muhammad Ilham',
-      amount: 1200000,
-      dueDate: DateTime(2025, 7, 22, 12, 9),
-      status: BillStatus.paid,
-      period: 'Juli 2025',
-    ),
-    Bill(
-      id: 'TGH-005',
-      title: 'Dana Masuk Dari',
-      subtitle: 'Muhammad Ilham',
-      amount: 1200000,
-      dueDate: DateTime(2025, 7, 22, 12, 9),
-      status: BillStatus.paid,
-      period: 'Juli 2025',
-    ),
-    Bill(
-      id: 'TGH-006',
-      title: 'Dana Masuk Dari',
-      subtitle: 'Muhammad Ilham',
-      amount: 1200000,
-      dueDate: DateTime(2025, 7, 22, 12, 9),
+      id: 'INV/087/329386',
+      title: 'Kegiatan Ekstrakurikuler',
+      subtitle: 'Tenggat Bayar : 25 Juli 2025, 23:59 WIB',
+      amount: 300000,
+      dueDate: DateTime(2025, 7, 25, 23, 59),
       status: BillStatus.paid,
       period: 'Juli 2025',
     ),
@@ -112,408 +79,184 @@ class _RiwayatTagihanPageState extends State<RiwayatTagihanPage> with SingleTick
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+  }
+
+  String _getBillCategory(Bill bill) {
+    final t = bill.title.toLowerCase();
+    if (t.contains('spp')) return 'SPP';
+    if (t.contains('seragam')) return 'Seragam';
+    if (t.contains('makan')) return 'Makan';
+    if (t.contains('buku')) return 'Buku';
+    if (t.contains('kegiatan') || t.contains('ekstrakurikuler')) return 'Kegiatan';
+    return 'Lainnya';
+  }
+
+  void _showFilterDialog() {
+    String tempSortOrder = _selectedSortOrder;
+    DateTime? tempStartDate = _startDate;
+    DateTime? tempEndDate = _endDate;
+    Map<String, bool> tempCategoryFilters = Map.from(_categoryFilters);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => HistoryFilterWidget(
+        selectedSortOrder: tempSortOrder,
+        startDate: tempStartDate,
+        endDate: tempEndDate,
+        categoryFilters: tempCategoryFilters,
+        availableCategories: _categoryFilters.keys.toList(),
+        onSortOrderChanged: (sortOrder) {
+          tempSortOrder = sortOrder;
+        },
+        onStartDateChanged: (startDate) {
+          tempStartDate = startDate;
+        },
+        onEndDateChanged: (endDate) {
+          tempEndDate = endDate;
+        },
+        onCategoryFiltersChanged: (categoryFilters) {
+          tempCategoryFilters = categoryFilters;
+        },
+        onApply: () {
+          setState(() {
+            _selectedSortOrder = tempSortOrder;
+            _startDate = tempStartDate;
+            _endDate = tempEndDate;
+            _categoryFilters
+              ..clear()
+              ..addAll(tempCategoryFilters);
+          });
+        },
+        onReset: () {
+          setState(() {
+            _selectedSortOrder = 'Terbaru';
+            _startDate = null;
+            _endDate = null;
+            _categoryFilters.updateAll((key, value) => true);
+          });
+        },
+        title: 'Filter Riwayat Tagihan',
+      ),
+    );
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
-    _searchController.dispose();
     super.dispose();
+  }
+
+  List<Bill> get _filteredBills {
+    List<Bill> filtered = List.from(_allBills);
+    
+    // Filter by main tab
+    // Single tab: only show paid (Pembayaran Berhasil)
+    filtered = filtered.where((bill) => bill.status == BillStatus.paid).toList();
+    
+    // Filter by date range (based on dueDate)
+    if (_startDate != null || _endDate != null) {
+      filtered = filtered.where((bill) {
+        final d = bill.dueDate;
+        if (_startDate != null && _endDate != null) {
+          return d.isAfter(_startDate!.subtract(const Duration(days: 1))) && d.isBefore(_endDate!.add(const Duration(days: 1)));
+        } else if (_startDate != null) {
+          return d.isAfter(_startDate!.subtract(const Duration(days: 1)));
+        } else if (_endDate != null) {
+          return d.isBefore(_endDate!.add(const Duration(days: 1)));
+        }
+        return true;
+      }).toList();
+    }
+    
+    // Filter by category inferred from title
+    filtered = filtered.where((bill) {
+      final cat = _getBillCategory(bill);
+      return _categoryFilters[cat] == true;
+    }).toList();
+    
+    // Sort by newest first
+    if (_selectedSortOrder == 'Terbaru') {
+      filtered.sort((a, b) => b.dueDate.compareTo(a.dueDate));
+    } else {
+      filtered.sort((a, b) => a.dueDate.compareTo(b.dueDate));
+    }
+    
+    return filtered;
   }
 
   @override
   Widget build(BuildContext context) {
-    final baseTheme = Theme.of(context);
-    final themed = baseTheme.copyWith(
-      textTheme: baseTheme.textTheme.apply(fontFamily: 'Poppins'),
-    );
-
-    return Theme(
-      data: themed,
-      child: Scaffold(
-        backgroundColor: Colors.grey[50],
-        appBar: CustomAppBar(
-          title: 'Riwayat Tagihan',
-          backgroundColor: AppStyles.primaryColor,
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: AppStyles.primaryColor,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
         ),
-        body: Column(
-          children: [
-            // Tab Bar
-            Container(
-              color: Colors.white,
-              child: TabBar(
-                controller: _tabController,
-                labelColor: AppStyles.primaryColor,
-                unselectedLabelColor: Colors.grey[600],
-                indicatorColor: AppStyles.primaryColor,
-                indicatorWeight: 3,
-                labelStyle: const TextStyle(
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                ),
-                unselectedLabelStyle: const TextStyle(
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                  fontSize: 16,
-                ),
-                tabs: const [
-                  Tab(text: 'Pemasukan'),
-                  Tab(text: 'Pengeluaran'),
-                  Tab(text: 'Laporan'),
-                ],
-              ),
-            ),
-            // Filter Section
-            Container(
-              color: Colors.white,
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Semua',
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey[700],
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _showFilter = !_showFilter;
-                      });
-                    },
-                    child: Row(
-                      children: [
-                        Text(
-                          'Filter',
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: AppStyles.primaryColor,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Icon(
-                          Icons.tune,
-                          color: AppStyles.primaryColor,
-                          size: 20,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Content
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildTransactionList(_allBills),
-                  _buildTransactionList([]), // Empty for pengeluaran
-                  _buildReportTab(), // Laporan dengan chart
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTransactionList(List<Bill> bills) {
-    if (bills.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.inbox_outlined,
-              size: 64,
-              color: Colors.grey[400],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Belum ada transaksi',
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey[600],
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return ListView.separated(
-      padding: const EdgeInsets.all(16),
-      itemCount: bills.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 12),
-      itemBuilder: (context, index) {
-        final bill = bills[index];
-        return _buildTransactionItem(bill);
-      },
-    );
-  }
-
-  Widget _buildTransactionItem(Bill bill) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+        title: const Text(
+          'Riwayat Tagihan',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            fontFamily: 'Poppins',
           ),
-        ],
+        ),
+        centerTitle: true,
       ),
-      child: Row(
+      body: Column(
         children: [
-          // Icon
+          // No tabs needed since only one status is shown
+          
+          // Filter section
           Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: Colors.pink[50],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              Icons.account_balance_wallet_outlined,
-              color: Colors.pink[300],
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 16),
-          // Content
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            color: Colors.grey[50],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  bill.title,
-                  style: const TextStyle(
+                  'Berhasil',
+                  style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                    color: Colors.grey[800],
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  bill.subtitle ?? '',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey[600],
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Bank Mandiri',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey[500],
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  _formatDateTime(bill.dueDate),
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey[500],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Amount
-          Text(
-            _formatAmount(bill.amount),
-            style: const TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _formatAmount(int amount) {
-    final s = amount.toString();
-    final reg = RegExp(r'\B(?=(\d{3})+(?!\d))');
-    return '- Rp ${s.replaceAllMapped(reg, (m) => '.')}';
-  }
-
-  String _formatDateTime(DateTime date) {
-    final day = date.day.toString().padLeft(2, '0');
-    final year = date.year;
-    final hour = date.hour.toString().padLeft(2, '0');
-    final minute = date.minute.toString().padLeft(2, '0');
-    return '$day Juli $year $hour:$minute WIB';
-  }
-
-  Widget _buildReportTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Period Filter
-          Row(
-            children: [
-              _buildPeriodChip('Bulan Ini', _selectedPeriod == 'Bulan Ini'),
-              const SizedBox(width: 8),
-              _buildPeriodChip('Bulan Lalu', _selectedPeriod == 'Bulan Lalu'),
-              const SizedBox(width: 8),
-              _buildPeriodChip('3 Bulan', _selectedPeriod == '3 Bulan'),
-            ],
-          ),
-          const SizedBox(height: 16),
-          
-          // Period Label
-          Text(
-            _selectedPeriod,
-            style: TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey[600],
-            ),
-          ),
-          const SizedBox(height: 24),
-          
-          // Summary Card
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                Text(
-                  'Selisih',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey[600],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Rp. 7.200.000',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 24,
-                    fontWeight: FontWeight.w600,
-                    color: AppStyles.primaryColor,
-                  ),
-                ),
-                const SizedBox(height: 20),
                 Row(
                   children: [
-                    Expanded(
-                      child: Column(
+                    Text(
+                      _selectedSortOrder,
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    GestureDetector(
+                      onTap: _showFilterDialog,
+                      child: Row(
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: 12,
-                                height: 12,
-                                decoration: BoxDecoration(
-                                  color: AppStyles.primaryColor,
-                                  borderRadius: BorderRadius.circular(2),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Pemasukan',
-                                style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
                           Text(
-                            '+Rp.7.200.000',
+                            'Filter',
                             style: TextStyle(
                               fontFamily: 'Poppins',
                               fontSize: 14,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w500,
                               color: AppStyles.primaryColor,
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: 12,
-                                height: 12,
-                                decoration: BoxDecoration(
-                                  color: Colors.pink[300],
-                                  borderRadius: BorderRadius.circular(2),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Pengeluaran',
-                                style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '-Rp.0',
-                            style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.pink[300],
-                            ),
+                          const SizedBox(width: 6),
+                          Icon(
+                            Icons.tune,
+                            size: 18,
+                            color: AppStyles.primaryColor,
                           ),
                         ],
                       ),
@@ -523,156 +266,16 @@ class _RiwayatTagihanPageState extends State<RiwayatTagihanPage> with SingleTick
               ],
             ),
           ),
-          const SizedBox(height: 24),
           
-          // Doughnut Chart
-          Container(
-            height: 200,
-            child: SfCircularChart(
-              margin: EdgeInsets.zero,
-              series: <CircularSeries>[
-                DoughnutSeries<ChartData, String>(
-                  dataSource: _getChartData(),
-                  xValueMapper: (ChartData data, _) => data.category,
-                  yValueMapper: (ChartData data, _) => data.value,
-                  pointColorMapper: (ChartData data, _) => data.color,
-                  innerRadius: '70%',
-                  radius: '90%',
-                  dataLabelSettings: DataLabelSettings(
-                    isVisible: false,
-                  ),
-                ),
-              ],
-              annotations: <CircularChartAnnotation>[
-                CircularChartAnnotation(
-                  widget: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '100%',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600,
-                          color: AppStyles.primaryColor,
-                        ),
-                      ),
-                      Text(
-                        'Pemasukan',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-          
-          // Category Sections
-          Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedCategory = 'Pemasukan';
-                    });
-                  },
-                  child: Column(
-                    children: [
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                        height: 2,
-                        color: _selectedCategory == 'Pemasukan' ? AppStyles.primaryColor : Colors.grey[300],
-                      ),
-                      const SizedBox(height: 12),
-                      AnimatedDefaultTextStyle(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 16,
-                          fontWeight: _selectedCategory == 'Pemasukan' ? FontWeight.w600 : FontWeight.w500,
-                          color: _selectedCategory == 'Pemasukan' ? AppStyles.primaryColor : Colors.grey[600],
-                        ),
-                        child: const Text('Pemasukan'),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(width: 24),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedCategory = 'Pengeluaran';
-                    });
-                  },
-                  child: Column(
-                    children: [
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                        height: 2,
-                        color: _selectedCategory == 'Pengeluaran' ? AppStyles.primaryColor : Colors.grey[300],
-                      ),
-                      const SizedBox(height: 12),
-                      AnimatedDefaultTextStyle(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 16,
-                          fontWeight: _selectedCategory == 'Pengeluaran' ? FontWeight.w600 : FontWeight.w500,
-                          color: _selectedCategory == 'Pengeluaran' ? AppStyles.primaryColor : Colors.grey[600],
-                        ),
-                        child: const Text('Pengeluaran'),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          
-          // Transaction List for Report
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 400),
-            transitionBuilder: (Widget child, Animation<double> animation) {
-              return FadeTransition(
-                opacity: animation,
-                child: SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(0.1, 0),
-                    end: Offset.zero,
-                  ).animate(CurvedAnimation(
-                    parent: animation,
-                    curve: Curves.easeInOut,
-                  )),
-                  child: child,
-                ),
-              );
-            },
-            child: Column(
-              key: ValueKey(_selectedCategory),
-              children: (_selectedCategory == 'Pemasukan' 
-                  ? _allBills.where((bill) => bill.title.contains('Dana Masuk')).take(2)
-                  : _allBills.where((bill) => !bill.title.contains('Dana Masuk')).take(2)
-              ).map((bill) {
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  child: _buildTransactionItem(bill),
-                );
-              }).toList(),
+          // Transaction list
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: _filteredBills.length,
+              itemBuilder: (context, index) {
+                final bill = _filteredBills[index];
+                return _buildTransactionItem(bill);
+              },
             ),
           ),
         ],
@@ -680,46 +283,172 @@ class _RiwayatTagihanPageState extends State<RiwayatTagihanPage> with SingleTick
     );
   }
 
-  Widget _buildPeriodChip(String label, bool isSelected) {
+  Widget _buildTransactionItem(Bill bill) {
+    Color statusColor;
+    Color statusBgColor;
+    String statusText;
+    IconData statusIcon;
+
+    switch (bill.status) {
+      case BillStatus.pending:
+        statusColor = Colors.grey[600]!;
+        statusBgColor = Colors.grey[50]!;
+        statusText = 'Menunggu';
+        statusIcon = Icons.schedule;
+        break;
+      case BillStatus.unpaid:
+        statusColor = Colors.orange[600]!;
+        statusBgColor = Colors.orange[50]!;
+        statusText = 'Belum Lunas';
+        statusIcon = Icons.access_time;
+        break;
+      case BillStatus.partial:
+        statusColor = Colors.blue[600]!;
+        statusBgColor = Colors.blue[50]!;
+        statusText = 'Terbayar Sebagian';
+        statusIcon = Icons.hourglass_bottom;
+        break;
+      case BillStatus.paid:
+        statusColor = Colors.green[600]!;
+        statusBgColor = Colors.green[50]!;
+        statusText = 'Pembayaran Berhasil';
+        statusIcon = Icons.check_circle_outline;
+        break;
+    }
+
     return GestureDetector(
       onTap: () {
-        setState(() {
-          _selectedPeriod = label;
-        });
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailTagihanPage(bill: bill),
+          ),
+        );
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? AppStyles.primaryColor : Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isSelected ? AppStyles.primaryColor : Colors.grey[300]!,
-          ),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontFamily: 'Poppins',
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: isSelected ? Colors.white : Colors.grey[600],
-          ),
+        child: Row(
+          children: [
+            // Status Icon
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: statusBgColor,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                statusIcon,
+                color: statusColor,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 16),
+            
+            // Content
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Invoice ID
+                  Text(
+                    bill.id,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.grey[500],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  
+                  // Title
+                  Text(
+                    bill.title,
+                    style: const TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                      height: 1.2,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  
+                  // Subtitle
+                  Text(
+                    bill.subtitle ?? '',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.grey[500],
+                      height: 1.3,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            
+            // Amount and status
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  'Rp ${NumberFormat('#,###').format(bill.amount)}',
+                  style: const TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: bill.status == BillStatus.paid 
+                        ? Colors.green[100] 
+                        : bill.status == BillStatus.pending
+                        ? Colors.grey[100]
+                        : Colors.orange[100],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    statusText,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: bill.status == BillStatus.paid 
+                          ? Colors.green[700] 
+                          : bill.status == BillStatus.pending
+                          ? Colors.grey[700]
+                          : Colors.orange[700],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
   }
-
-  List<ChartData> _getChartData() {
-    return [
-      ChartData('Pemasukan', 100, AppStyles.primaryColor),
-      ChartData('Pengeluaran', 0, Colors.pink[300]!),
-    ];
-  }
-}
-
-class ChartData {
-  ChartData(this.category, this.value, this.color);
-  final String category;
-  final double value;
-  final Color color;
 }
