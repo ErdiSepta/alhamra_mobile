@@ -33,129 +33,119 @@ class StatusMenungguPage extends StatelessWidget {
                   children: [
                     const SizedBox(height: 10),
                     
-                    // Main Content Card
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
+                    // Profile Image
+                    const CircleAvatar(
+                      radius: 40,
+                      backgroundImage: NetworkImage(
+                        'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
                       ),
-                      child: Column(
+                    ),
+                    
+                    const SizedBox(height: 20),
+                    
+                    // Status Badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          // Profile Image
-                          const CircleAvatar(
-                            radius: 35,
-                            backgroundImage: NetworkImage(
-                              'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                            ),
+                          Icon(
+                            Icons.access_time,
+                            color: Colors.orange,
+                            size: 16,
                           ),
-                          
-                          const SizedBox(height: 16),
-                          
-                          // Status Text with Clock Icon
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Menunggu Konfirmasi',
-                                style: AppStyles.bodyText(context).copyWith(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.all(4),
-                                decoration: const BoxDecoration(
-                                  color: Colors.orange,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.access_time,
-                                  color: Colors.white,
-                                  size: 16,
-                                ),
-                              ),
-                            ],
-                          ),
-                          
-                          const SizedBox(height: 8),
-                          
-                          // Date Time
+                          const SizedBox(width: 8),
                           Text(
-                            '10-09-2025, 09:56 WIB',
+                            'Menunggu Konfirmasi',
                             style: AppStyles.bodyText(context).copyWith(
                               fontSize: 14,
-                              color: Colors.grey[600],
+                              fontWeight: FontWeight.w500,
+                              color: Colors.orange,
                             ),
-                          ),
-                          
-                          const SizedBox(height: 24),
-                          
-                          // Divider
-                          Container(
-                            height: 1,
-                            color: Colors.grey[300],
-                          ),
-                          
-                          const SizedBox(height: 24),
-                          
-                          // Invoice Details
-                          Column(
-                            children: [
-                              _buildDetailRow('ID Invoice', 'INV/0900/23922'),
-                              const SizedBox(height: 12),
-                              _buildDetailRow('Nama Pengirim', 'Idris Nur Wahyudi'),
-                              const SizedBox(height: 12),
-                              _buildDetailRow('Administrator', 'Diah Al Quwari'),
-                              const SizedBox(height: 12),
-                              _buildDetailRow('Tgl. Konfirmasi', '20-09-2025'),
-                            ],
-                          ),
-                          
-                          const SizedBox(height: 24),
-                          
-                          // Detail Pembayaran Header
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              'Detail Pembayaran',
-                              style: AppStyles.bodyText(context).copyWith(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ),
-                          
-                          const SizedBox(height: 16),
-                          
-                          // Payment Details
-                          Column(
-                            children: [
-                              _buildDetailRow('Rekening Pengirim', '3513839289292'),
-                              const SizedBox(height: 12),
-                              _buildDetailRow('Nominal Pembayaran', amount != null ? 'Rp. ${amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}' : 'Rp. 1.400.000'),
-                              const SizedBox(height: 12),
-                              _buildDetailRow('Keterangan', 'SPP 2025'),
-                              const SizedBox(height: 12),
-                              _buildDetailRow('Nama Santri', 'Naufal Ramadhan'),
-                            ],
                           ),
                         ],
                       ),
                     ),
                     
+                    const SizedBox(height: 12),
+                    
+                    // Date Time
+                    Text(
+                      '17-09-2025, 23:51 WIB',
+                      style: AppStyles.bodyText(context).copyWith(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    
                     const SizedBox(height: 30),
+                    
+                    // Invoice Details Card
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey[200]!),
+                      ),
+                      child: Column(
+                        children: [
+                          _buildDetailRow('ID Invoice', 'INV/083/329383', isBlue: true),
+                          const SizedBox(height: 16),
+                          _buildDetailRow('Nama Pengirim', 'Muhammad Faithfullah\nIlhamy Azda'),
+                          const SizedBox(height: 16),
+                          _buildDetailRow('Administrator', 'Diah Al Quwari'),
+                          const SizedBox(height: 16),
+                          _buildDetailRow('Tgl. Konfirmasi', '18-09-2025'),
+                        ],
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 20),
+                    
+                    // Detail Pembayaran Expandable
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey[200]!),
+                      ),
+                      child: ExpansionTile(
+                        title: Text(
+                          'Detail Pembayaran',
+                          style: AppStyles.bodyText(context).copyWith(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
+                        ),
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                            child: Column(
+                              children: [
+                                _buildDetailRow('Rekening Pengirim', '3513839289292'),
+                                const SizedBox(height: 16),
+                                _buildDetailRow('Nominal Pembayaran', amount != null ? 'Rp. ${amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}' : 'Rp. 1.400.000'),
+                                const SizedBox(height: 16),
+                                _buildDetailRow('Keterangan', 'SPP 2025'),
+                                const SizedBox(height: 16),
+                                _buildDetailRow('Nama Santri', 'Naufal Ramadhan'),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 120),
                     
                     // Kembali Button
                     SizedBox(
@@ -183,7 +173,7 @@ class StatusMenungguPage extends StatelessWidget {
                       ),
                     ),
                     
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 40),
                   ],
                 ),
               ),
@@ -194,7 +184,7 @@ class StatusMenungguPage extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
+  Widget _buildDetailRow(String label, String value, {bool isBlue = false}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -209,9 +199,9 @@ class StatusMenungguPage extends StatelessWidget {
         Flexible(
           child: Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
-              color: Colors.black,
+              color: isBlue ? Colors.blue : Colors.black,
               fontWeight: FontWeight.w500,
             ),
             textAlign: TextAlign.right,
