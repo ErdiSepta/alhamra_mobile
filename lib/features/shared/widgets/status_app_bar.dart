@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import '../../../core/utils/app_styles.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:alhamra_1/core/utils/app_styles.dart';
 
 class StatusAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final VoidCallback? onBackPressed;
   final Color? backgroundColor;
   final double height;
+  final bool showBackButton;
+  final List<Widget>? actions;
 
   const StatusAppBar({
     super.key,
@@ -13,6 +16,8 @@ class StatusAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.onBackPressed,
     this.backgroundColor,
     this.height = 80.0,
+    this.showBackButton = true,
+    this.actions,
   });
 
   @override
@@ -27,27 +32,30 @@ class StatusAppBar extends StatelessWidget implements PreferredSizeWidget {
           child: Stack(
             children: [
               // Back button positioned on the left
-              Positioned(
-                left: 0,
-                top: 0,
-                bottom: 0,
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.arrow_back,
-                    color: Colors.white,
-                    size: 24,
+              if (showBackButton)
+                Positioned(
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.arrow_back,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                    onPressed: onBackPressed ?? () => Navigator.pop(context),
+                    padding: const EdgeInsets.all(8),
                   ),
-                  onPressed: onBackPressed ?? () => Navigator.pop(context),
-                  padding: const EdgeInsets.all(8),
                 ),
-              ),
               // Centered title with better typography
               Center(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 56), // Account for back button space
+                  padding: EdgeInsets.symmetric(
+                    horizontal: showBackButton ? 56 : 16,
+                  ),
                   child: Text(
                     title,
-                    style: const TextStyle(
+                    style: GoogleFonts.poppins(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
@@ -59,6 +67,17 @@ class StatusAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
               ),
+              // Actions positioned on the right
+              if (actions != null && actions!.isNotEmpty)
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: actions!,
+                  ),
+                ),
             ],
           ),
         ),

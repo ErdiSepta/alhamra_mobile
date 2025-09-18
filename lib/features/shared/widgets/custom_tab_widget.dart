@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/utils/app_styles.dart';
 
 class CustomTabWidget extends StatelessWidget {
@@ -32,13 +33,11 @@ class CustomTabWidget extends StatelessWidget {
         indicatorWeight: 3,
         labelColor: AppStyles.primaryColor,
         unselectedLabelColor: Colors.grey[600],
-        labelStyle: const TextStyle(
-          fontFamily: 'Poppins',
+        labelStyle: GoogleFonts.poppins(
           fontWeight: FontWeight.w600,
           fontSize: 16,
         ),
-        unselectedLabelStyle: const TextStyle(
-          fontFamily: 'Poppins',
+        unselectedLabelStyle: GoogleFonts.poppins(
           fontWeight: FontWeight.w500,
           fontSize: 16,
         ),

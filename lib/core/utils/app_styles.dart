@@ -163,8 +163,8 @@ class AppStyles {
 
   static TextStyle menuLabel(BuildContext context) => GoogleFonts.poppins(
     fontSize: getResponsiveFontSize(context, small: 10.0, medium: 11.0, large: 12.0),
-    fontWeight: FontWeight.w400,
-    color: mediumGreyColor,
+    fontWeight: FontWeight.w500,
+    color: blackColor,
   );
 
   static TextStyle bottomNavActive(BuildContext context) => GoogleFonts.poppins(

@@ -49,23 +49,23 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Set default to index 2 (Beranda - center item)
+    // Set default to index 0 (Menu - first item)
     PersistentTabController controller = PersistentTabController(
-      initialIndex: 2,
+      initialIndex: 0,
     );
 
     List<Widget> buildScreens() {
       return [
-        const BerandaPage(), // Menu (now shows Beranda content)
-        const StatusPage(), // Bayar
+        const BerandaPage(), // Menu (shows Beranda content)
+        const StatusPage(), // Status
         const PlaceholderPage(
           title: 'Beranda',
-          icon: Icons.menu,
-        ), // Beranda (center) now empty
+          icon: Icons.home,
+        ), // Beranda (center)
         const PlaceholderPage(
-          title: 'Status',
-          icon: Icons.history_outlined,
-        ), // Status
+          title: 'Aktivitas',
+          icon: Icons.local_activity,
+        ), // Aktivitas
         ProfilPage(), // Akun
       ];
     }
@@ -74,7 +74,7 @@ class HomeScreen extends StatelessWidget {
       return [
         // Menu
         PersistentBottomNavBarItem(
-          icon: const Icon(Icons.home, size: 26),
+          icon: const Icon(Icons.menu, size: 26),
           title: "Menu",
           activeColorPrimary: AppStyles.primaryColor,
           inactiveColorPrimary: const Color(0xFFAAAAAA),
@@ -83,7 +83,7 @@ class HomeScreen extends StatelessWidget {
             fontWeight: FontWeight.w500,
           ),
         ),
-        // Bayar
+        // Status
         PersistentBottomNavBarItem(
           icon: const Icon(Icons.history_outlined, size: 26),
           title: "Status",
@@ -96,7 +96,7 @@ class HomeScreen extends StatelessWidget {
         ),
         // Beranda (Center - Default)
         PersistentBottomNavBarItem(
-          icon: const Icon(Icons.menu, size: 26),
+          icon: const Icon(Icons.home, size: 26),
           title: "Beranda",
           activeColorPrimary: AppStyles.primaryColor,
           inactiveColorPrimary: const Color(0xFFAAAAAA),
@@ -105,7 +105,7 @@ class HomeScreen extends StatelessWidget {
             fontWeight: FontWeight.w500,
           ),
         ),
-        // Status
+        // Aktivitas
         PersistentBottomNavBarItem(
           icon: const Icon(Icons.local_activity, size: 26),
           title: "Aktivitas",

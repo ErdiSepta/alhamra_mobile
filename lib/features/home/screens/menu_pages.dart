@@ -3,15 +3,19 @@ import '../../../core/utils/app_styles.dart';
 import '../../../core/data/student_data.dart';
 import '../../../features/payment/screens/standalone_pembayaran_page.dart';
 import '../../../features/notifications/screens/pemberitahuan_page.dart';
-import '../../../features/payment/screens/status_berhasil_page.dart';
 import '../../../core/services/notification_service.dart';
 import '../../history/screens/riwayat_tagihan_page.dart';
 import '../../history/screens/riwayat_uang_saku_page.dart';
 import '../../history/screens/riwayat_dompet_page.dart';
 import '../../shared/widgets/index.dart';
 import '../../shared/widgets/student_selection_widget.dart';
+import '../../news/screens/news_list_screen.dart';
+import '../../news/screens/news_detail_screen.dart';
+import '../../../core/services/news_service.dart';
+import '../../../core/models/article_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'dart:async';
 
 class BerandaPage extends StatefulWidget {
@@ -43,6 +47,18 @@ class _BerandaPageState extends State<BerandaPage> {
   Timer? _refreshTimer;
   int _ellipsisStep = 0;
 
+  // News data
+  List<Article> _newsArticles = [];
+  bool _isLoadingNews = false;
+  final NewsService _newsService = NewsService();
+  
+  // Facilities data (using news articles)
+  List<Article> _facilitiesArticles = [];
+  bool _isLoadingFacilities = false;
+  
+  // Pull to refresh
+  bool _isRefreshingAll = false;
+
   @override
   void initState() {
     super.initState();
@@ -59,6 +75,95 @@ class _BerandaPageState extends State<BerandaPage> {
         });
       }
     });
+    _loadNews();
+    _loadFacilities();
+  }
+
+  Future<void> _loadNews() async {
+    setState(() {
+      _isLoadingNews = true;
+    });
+    
+    try {
+      final articles = await _newsService.getNews(pageSize: 3).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          // Return sample data on timeout
+          return _newsService.getSampleNews().take(3).toList();
+        },
+      );
+      setState(() {
+        _newsArticles = articles;
+        _isLoadingNews = false;
+      });
+    } catch (e) {
+      print('Error loading news: $e');
+      // Fallback to sample data
+      setState(() {
+        _newsArticles = _newsService.getSampleNews().take(3).toList();
+        _isLoadingNews = false;
+      });
+    }
+  }
+
+  Future<void> _loadFacilities() async {
+    setState(() {
+      _isLoadingFacilities = true;
+    });
+    
+    try {
+      final articles = await _newsService.getNews(pageSize: 6).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          return _newsService.getSampleNews().take(6).toList();
+        },
+      );
+      setState(() {
+        _facilitiesArticles = articles;
+        _isLoadingFacilities = false;
+      });
+    } catch (e) {
+      print('Error loading facilities: $e');
+      setState(() {
+        _facilitiesArticles = _newsService.getSampleNews().take(6).toList();
+        _isLoadingFacilities = false;
+      });
+    }
+  }
+
+  Future<void> _refreshAllData() async {
+    setState(() {
+      _isRefreshingAll = true;
+    });
+    
+    try {
+      // Reload both news and facilities data
+      await Future.wait([
+        _loadNews(),
+        _loadFacilities(),
+      ]);
+    } catch (e) {
+      print('Error refreshing data: $e');
+    } finally {
+      setState(() {
+        _isRefreshingAll = false;
+      });
+    }
+  }
+
+  String _getTimeAgo(DateTime publishedAt) {
+    final now = DateTime.now();
+    final difference = now.difference(publishedAt);
+
+    if (difference.inDays > 0) {
+      return '${difference.inDays} hari lalu';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours} jam lalu';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes} menit lalu';
+    } else {
+      return 'Baru saja';
+    }
   }
 
   @override
@@ -213,19 +318,24 @@ class _BerandaPageState extends State<BerandaPage> {
         ),
         body: Stack(
           children: [
-            SingleChildScrollView(
-              controller: _scrollController,
-              child: Column(
-                children: [
-                  const SizedBox(height: 16),
-                  _buildSantriSelector(),
-                  const SizedBox(height: 20),
-                  _buildInfoCarousel(),
-                  const SizedBox(height: 10),
-                  _buildPageIndicator(),
-                  const SizedBox(height: 16),
-                  _buildBottomContent(),
-                ],
+            RefreshIndicator(
+              onRefresh: _refreshAllData,
+              color: AppStyles.primaryColor,
+              backgroundColor: Colors.white,
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  children: [
+                    _buildSantriSelector(),
+                    const SizedBox(height: 20),
+                    _buildInfoCarousel(),
+                    const SizedBox(height: 10),
+                    _buildPageIndicator(),
+                    const SizedBox(height: 16),
+                    _buildBottomContent(),
+                  ],
+                ),
               ),
             ),
             // Add overlay at the top level to ensure it appears above all content
@@ -405,6 +515,42 @@ class _BerandaPageState extends State<BerandaPage> {
     );
   }
 
+  Widget _buildMenuItem(BuildContext context, {required IconData icon, required String label, required Color color, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Icon(
+              icon,
+              color: color,
+              size: 28,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: AppStyles.menuLabel(context).copyWith(
+              fontSize: 11, 
+              color: Colors.black87, 
+              fontWeight: FontWeight.w500
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
 
   Widget _buildBottomContent() {
     return Container(
@@ -433,70 +579,113 @@ class _BerandaPageState extends State<BerandaPage> {
             crossAxisCount: 4,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 20,
+            childAspectRatio: 0.85,
             children: [
-              // Test Status Berhasil Button
-              GestureDetector(
+              // Profil Santri
+              _buildMenuItem(
+                context,
+                icon: Icons.person,
+                label: 'Profil Santri',
+                color: Colors.blue,
                 onTap: () {
-                  Navigator.of(context, rootNavigator: true).push(
-                    MaterialPageRoute(
-                      builder: (context) => const StatusBerhasilPage(amount: 1400000),
-                    ),
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Fitur Profil Santri akan segera hadir')),
                   );
                 },
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: Colors.green.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.check_circle,
-                        color: Colors.green,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Status Berhasil',
-                      style: AppStyles.bodyText(
-                        context,
-                      ).copyWith(fontSize: 10, color: Colors.black87),
-                    ),
-                  ],
-                ),
               ),
-              // Regular menu items
-              ...List.generate(7, (i) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: AppStyles.primaryColor.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.apps,
-                        color: AppStyles.primaryColor,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Menu ${i + 2}',
-                      style: AppStyles.bodyText(
-                        context,
-                      ).copyWith(fontSize: 12, color: Colors.black87),
-                    ),
-                  ],
-                );
-              }),
+              
+              // Info Akademik
+              _buildMenuItem(
+                context,
+                icon: Icons.wifi_tethering,
+                label: 'Info Akademik',
+                color: Colors.blue,
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Fitur Info Akademik akan segera hadir')),
+                  );
+                },
+              ),
+              
+              // Absensi
+              _buildMenuItem(
+                context,
+                icon: Icons.check_box,
+                label: 'Absensi',
+                color: Colors.blue,
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Fitur Absensi akan segera hadir')),
+                  );
+                },
+              ),
+              
+              // Nilai Akademik
+              _buildMenuItem(
+                context,
+                icon: Icons.edit_note,
+                label: 'Nilai Akademik',
+                color: Colors.blue,
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Fitur Nilai Akademik akan segera hadir')),
+                  );
+                },
+              ),
+              
+              // Tahfidz Qur'an
+              _buildMenuItem(
+                context,
+                icon: Icons.menu_book,
+                label: 'Tahfidz Qur\'an',
+                color: Colors.blue,
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Fitur Tahfidz Qur\'an akan segera hadir')),
+                  );
+                },
+              ),
+              
+              // Tahsin
+              _buildMenuItem(
+                context,
+                icon: Icons.g_translate,
+                label: 'Tahsin',
+                color: Colors.blue,
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Fitur Tahsin akan segera hadir')),
+                  );
+                },
+              ),
+              
+              // Mutabaah
+              _buildMenuItem(
+                context,
+                icon: Icons.hiking,
+                label: 'Mutabaah',
+                color: Colors.blue,
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Fitur Mutabaah akan segera hadir')),
+                  );
+                },
+              ),
+              
+              // Formulir Perijinan
+              _buildMenuItem(
+                context,
+                icon: Icons.description,
+                label: 'Formulir Perijinan',
+                color: Colors.blue,
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Fitur Formulir Perijinan akan segera hadir')),
+                  );
+                },
+              ),
             ],
           ),
           const SizedBox(height: 20),
@@ -509,87 +698,326 @@ class _BerandaPageState extends State<BerandaPage> {
             ),
           ),
           const SizedBox(height: 12),
-          SizedBox(
-            height: 110,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: 6,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
-              itemBuilder: (context, i) {
-                return Container(
-                  width: 140,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.06),
-                        blurRadius: 6,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Text(
-                        'Fasilitas ${i + 1}',
-                        style: AppStyles.bodyText(
-                          context,
-                        ).copyWith(color: Colors.black87),
-                      ),
+          _isLoadingFacilities
+              ? const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(20.0),
+                    child: CircularProgressIndicator(
+                      color: AppStyles.primaryColor,
                     ),
                   ),
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            'Berita',
-            style: AppStyles.bodyText(context).copyWith(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Colors.black,
-            ),
-          ),
-          const SizedBox(height: 8),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: 5,
-            separatorBuilder: (_, __) => const Divider(height: 24),
-            itemBuilder: (context, i) {
-              return ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: AppStyles.primaryColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
+                )
+              : SizedBox(
+                  height: 140,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: (_facilitiesArticles.length > 5 ? 5 : _facilitiesArticles.length) + 1,
+                    separatorBuilder: (_, __) => const SizedBox(width: 12),
+                    itemBuilder: (context, index) {
+                      // Show "Lihat Semua" as the last item
+                      if (index == (_facilitiesArticles.length > 5 ? 5 : _facilitiesArticles.length)) {
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.of(context, rootNavigator: true).push(
+                              MaterialPageRoute(builder: (context) => const NewsListScreen()),
+                            );
+                          },
+                          child: Container(
+                            width: 180,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: AppStyles.primaryColor.withOpacity(0.3),
+                                width: 2,
+                              ),
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.08),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: AppStyles.primaryColor.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(50),
+                                  ),
+                                  child: Icon(
+                                    Icons.arrow_forward,
+                                    color: AppStyles.primaryColor,
+                                    size: 24,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  'Lihat Semua',
+                                  style: AppStyles.bodyText(context).copyWith(
+                                    color: AppStyles.primaryColor,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Berita',
+                                  style: AppStyles.bodyText(context).copyWith(
+                                    color: Colors.grey[600],
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+                      
+                      // Show regular facility articles
+                      final article = _facilitiesArticles[index];
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.of(context, rootNavigator: true).push(
+                            MaterialPageRoute(
+                              builder: (context) => NewsDetailScreen(article: article),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          width: 180,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.08),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Stack(
+                              children: [
+                                // Background Image
+                                Positioned.fill(
+                                  child: _buildFacilityImageWidget(article.urlToImage),
+                                ),
+                                // Gradient Overlay
+                                Positioned.fill(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          Colors.transparent,
+                                          Colors.black.withOpacity(0.7),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                // Content
+                                Positioned(
+                                  bottom: 12,
+                                  left: 12,
+                                  right: 12,
+                                  child: Text(
+                                    article.title,
+                                    style: AppStyles.bodyText(context).copyWith(
+                                      color: Colors.white,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                  child: const Icon(
-                    Icons.article,
+                ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Berita',
+                style: AppStyles.bodyText(context).copyWith(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context, rootNavigator: true).push(
+                    MaterialPageRoute(builder: (context) => const NewsListScreen()),
+                  );
+                },
+                child: Text(
+                  'Lihat Semua',
+                  style: AppStyles.bodyText(context).copyWith(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
                     color: AppStyles.primaryColor,
                   ),
                 ),
-                title: Text(
-                  'Judul Berita ${i + 1}',
-                  style: AppStyles.bodyText(
-                    context,
-                  ).copyWith(fontWeight: FontWeight.w600, color: Colors.black),
-                ),
-                subtitle: const Text('Ringkasan singkat berita...'),
-                trailing: const Icon(
-                  Icons.chevron_right,
-                  color: AppStyles.primaryColor,
-                ),
-                onTap: () {},
-              );
-            },
+              ),
+            ],
           ),
+          const SizedBox(height: 8),
+          _isLoadingNews
+              ? const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(20.0),
+                    child: CircularProgressIndicator(
+                      color: AppStyles.primaryColor,
+                    ),
+                  ),
+                )
+              : ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _newsArticles.length,
+                  separatorBuilder: (_, __) => const Divider(height: 24),
+                  itemBuilder: (context, i) {
+                    final article = _newsArticles[i];
+                    final timeAgo = _getTimeAgo(article.publishedAt);
+                    
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: _buildNewsImageWidget(article.urlToImage),
+                      ),
+                      title: Text(
+                        article.title,
+                        style: AppStyles.bodyText(context).copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                          fontSize: 14,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 4),
+                          Text(
+                            article.description,
+                            style: AppStyles.bodyText(context).copyWith(
+                              color: Colors.grey[600],
+                              fontSize: 12,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            timeAgo,
+                            style: AppStyles.bodyText(context).copyWith(
+                              color: Colors.grey[500],
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                      trailing: const Icon(
+                        Icons.chevron_right,
+                        color: AppStyles.primaryColor,
+                      ),
+                      onTap: () {
+                        Navigator.of(context, rootNavigator: true).push(
+                          MaterialPageRoute(
+                            builder: (context) => NewsDetailScreen(article: article),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildNewsImageWidget(String imageUrl) {
+    // Check if URL is valid and not SVG
+    if (imageUrl.isEmpty || imageUrl.endsWith('.svg') || imageUrl.contains('svg')) {
+      return _buildNewsPlaceholderImage();
+    }
+
+    return CachedNetworkImage(
+      imageUrl: imageUrl,
+      width: 56,
+      height: 56,
+      fit: BoxFit.cover,
+      placeholder: (context, url) => _buildNewsPlaceholderImage(),
+      errorWidget: (context, url, error) => _buildNewsPlaceholderImage(),
+    );
+  }
+
+  Widget _buildNewsPlaceholderImage() {
+    return Container(
+      width: 56,
+      height: 56,
+      decoration: BoxDecoration(
+        color: AppStyles.primaryColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: const Icon(
+        Icons.article,
+        color: AppStyles.primaryColor,
+      ),
+    );
+  }
+
+  Widget _buildFacilityImageWidget(String imageUrl) {
+    // Check if URL is valid and not SVG
+    if (imageUrl.isEmpty || imageUrl.endsWith('.svg') || imageUrl.contains('svg')) {
+      return _buildFacilityPlaceholderImage();
+    }
+
+    return CachedNetworkImage(
+      imageUrl: imageUrl,
+      fit: BoxFit.cover,
+      placeholder: (context, url) => _buildFacilityPlaceholderImage(),
+      errorWidget: (context, url, error) => _buildFacilityPlaceholderImage(),
+    );
+  }
+
+  Widget _buildFacilityPlaceholderImage() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppStyles.primaryColor.withOpacity(0.8),
+            AppStyles.primaryColor.withOpacity(0.6),
+          ],
+        ),
+      ),
+      child: const Center(
+        child: Icon(
+          Icons.location_city,
+          color: Colors.white,
+          size: 32,
+        ),
       ),
     );
   }

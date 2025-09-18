@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/utils/app_styles.dart';
 import '../../../core/data/student_data.dart';
+import '../../../core/models/bill.dart';
 import '../../shared/widgets/index.dart';
 import '../../shared/widgets/history_filter_widget.dart';
 import '../../shared/widgets/student_selection_widget.dart';
-import 'status_menunggu_page.dart';
+import 'custom_status_menunggu_page.dart';
 import 'status_berhasil_page.dart';
 
 class StatusPage extends StatefulWidget {
@@ -796,9 +797,32 @@ class _StatusPageState extends State<StatusPage> with TickerProviderStateMixin {
                           );
                         } else {
                           // For belumLunas and sebagian (menunggu status)
+                          // Create PaymentData for CustomStatusMenungguPage
+                          final paymentData = PaymentData(
+                            bills: [
+                              Bill(
+                                id: payment.id,
+                                title: payment.type,
+                                subtitle: 'Pembayaran ${payment.type}',
+                                amount: payment.amount,
+                                dueDate: payment.dueDate,
+                                status: payment.status == PaymentStatus.belumLunas ? BillStatus.unpaid : BillStatus.partial,
+                                period: '${payment.dueDate.month}/${payment.dueDate.year}',
+                              ),
+                            ],
+                            studentName: payment.studentName,
+                            paymentMethod: 'Transfer Bank',
+                            virtualAccount: '1234567890123456',
+                            totalAmount: payment.amount,
+                            paymentDate: DateTime.now(),
+                            invoiceId: payment.id,
+                            senderName: 'Muhammad Faithfullah Ilhamy Azda',
+                            administrator: 'Diah Al Quwari',
+                          );
+                          
                           Navigator.of(context, rootNavigator: true).push(
                             MaterialPageRoute(
-                              builder: (context) => StatusMenungguPage(amount: payment.amount),
+                              builder: (context) => CustomStatusMenungguPage(paymentData: paymentData),
                               fullscreenDialog: true,
                             ),
                           );
