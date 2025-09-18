@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:pdf/widgets.dart' as pw;
 import 'package:screenshot/screenshot.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:file_saver/file_saver.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import 'dart:typed_data';
 
 import '../../../core/models/bill.dart';
 import '../../../core/utils/app_styles.dart';
@@ -122,154 +126,139 @@ class DetailTagihanPage extends StatelessWidget {
                 controller: screenshotController,
                 child: Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.16),
-                        blurRadius: 24,
-                        spreadRadius: 1,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                    ),
                   ),
                   child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Icon bulat
-                        Container(
-                          width: 70,
-                          height: 70,
-                          decoration: BoxDecoration(
-                            color: accent.withOpacity(0.1),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            statusIcon,
-                            color: accent,
-                            size: 35,
-                          ),
-                        ),
-
-                        const SizedBox(height: 16),
-
-                        // Status tagihan
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              statusText,
-                              style: AppStyles.bodyText(context).copyWith(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 8),
-
-                        // Tanggal jatuh tempo
-                        Text(
-                          'Jatuh Tempo: ${DateFormat('dd MMMM yyyy').format(bill.dueDate)}',
-                          style: AppStyles.bodyText(context).copyWith(
-                            fontSize: 14,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-
-                        const SizedBox(height: 24),
-
-                        // Garis
-                        Container(height: 1, color: Colors.grey[300]),
-
-                        const SizedBox(height: 24),
-
-                        // Detail tagihan
-                        Column(
-                          children: [
-                            _buildDetailRow('ID Tagihan', bill.id),
-                            const SizedBox(height: 12),
-                            _buildDetailRow('Jenis Tagihan', bill.title),
-                            if (bill.subtitle != null && bill.subtitle!.isNotEmpty) ...[
-                              const SizedBox(height: 12),
-                              _buildDetailRow('Keterangan', bill.subtitle!),
-                            ],
-                            const SizedBox(height: 12),
-                            _buildDetailRow('Periode', bill.period),
-                            const SizedBox(height: 12),
-                            _buildDetailRow('Jatuh Tempo', DateFormat('dd MMMM yyyy').format(bill.dueDate)),
-                            const SizedBox(height: 12),
-                            _buildDetailRow('Status', statusText),
-                          ],
-                        ),
-
-                        const SizedBox(height: 24),
-
-                        // Detail pembayaran
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'Detail Pembayaran',
-                            style: AppStyles.bodyText(context).copyWith(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black,
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 10),
+                          
+                          // Profile Image
+                          const CircleAvatar(
+                            radius: 40,
+                            backgroundImage: NetworkImage(
+                              'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
                             ),
                           ),
-                        ),
-
-                        const SizedBox(height: 16),
-
-                        Column(
-                          children: [
-                            _buildDetailRow('Total Tagihan', _formatCurrency(bill.amount)),
-                            if (bill.amountPaid != null && bill.amountPaid! > 0) ...[
-                              const SizedBox(height: 12),
-                              _buildDetailRow('Sudah Dibayar', _formatCurrency(bill.amountPaid!)),
-                            ],
-                            if (bill.outstanding > 0) ...[
-                              const SizedBox(height: 12),
-                              _buildDetailRow('Sisa Tagihan', _formatCurrency(bill.outstanding)),
-                            ],
-                          ],
-                        ),
-
-                        const SizedBox(height: 24),
-
-                        // Info tambahan warna lembut
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: accent.withOpacity(0.08),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: accent.withOpacity(0.25)),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                statusIcon,
-                                color: accent,
-                                size: 24,
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  _getBillStatusMessage(bill.status),
+                          
+                          const SizedBox(height: 20),
+                          
+                          // Status Badge
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: accent.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: accent.withOpacity(0.3)),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  statusIcon,
+                                  color: accent,
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  statusText,
                                   style: AppStyles.bodyText(context).copyWith(
                                     fontSize: 14,
-                                    color: Colors.black87,
+                                    fontWeight: FontWeight.w500,
+                                    color: accent,
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                          
+                          const SizedBox(height: 12),
+                          
+                          // Date Time
+                          Text(
+                            '${DateFormat('dd-MM-yyyy').format(bill.dueDate)}, 23:51 WIB',
+                            style: AppStyles.bodyText(context).copyWith(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          
+                          const SizedBox(height: 30),
+                          
+                          // Invoice Details Card
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[50],
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.grey[200]!),
+                            ),
+                            child: Column(
+                              children: [
+                                _buildDetailRow('ID Tagihan', bill.id, isBlue: true),
+                                const SizedBox(height: 16),
+                                _buildDetailRow('Jenis Tagihan', bill.title),
+                                const SizedBox(height: 16),
+                                _buildDetailRow('Periode', bill.period),
+                                const SizedBox(height: 16),
+                                _buildDetailRow('Jatuh Tempo', DateFormat('dd-MM-yyyy').format(bill.dueDate)),
+                              ],
+                            ),
+                          ),
+                          
+                          const SizedBox(height: 20),
+                          
+                          // Detail Pembayaran Expandable
+                          Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[50],
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.grey[200]!),
+                            ),
+                            child: ExpansionTile(
+                              title: Text(
+                                'Detail Pembayaran',
+                                style: AppStyles.bodyText(context).copyWith(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                                  child: Column(
+                                    children: [
+                                      _buildDetailRow('Total Tagihan', _formatCurrency(bill.amount)),
+                                      if (bill.amountPaid != null && bill.amountPaid! > 0) ...[
+                                        const SizedBox(height: 16),
+                                        _buildDetailRow('Sudah Dibayar', _formatCurrency(bill.amountPaid!)),
+                                      ],
+                                      if (bill.outstanding > 0) ...[
+                                        const SizedBox(height: 16),
+                                        _buildDetailRow('Sisa Tagihan', _formatCurrency(bill.outstanding)),
+                                      ],
+                                      if (bill.subtitle != null && bill.subtitle!.isNotEmpty) ...[
+                                        const SizedBox(height: 16),
+                                        _buildDetailRow('Keterangan', bill.subtitle!),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -281,64 +270,71 @@ class DetailTagihanPage extends StatelessWidget {
               bottom: 20,
               left: 20,
               right: 20,
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: SizedBox(
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: () => _share(context),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: accent,
-                          side: BorderSide(color: accent, width: 1),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 120),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: SizedBox(
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: () => _share(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: accent,
+                              side: BorderSide(color: accent, width: 1),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.share, color: accent, size: 20),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Bagikan',
+                                  style: AppStyles.bodyText(context).copyWith(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: accent,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          elevation: 0,
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.share, color: accent, size: 20),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Bagikan',
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: SizedBox(
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppStyles.primaryColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: Text(
+                              'Kembali',
                               style: AppStyles.bodyText(context).copyWith(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
-                                color: accent,
+                                color: Colors.white,
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: SizedBox(
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: () => Navigator.pop(context),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppStyles.primaryColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: Text(
-                          'Kembali',
-                          style: AppStyles.bodyText(context).copyWith(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
                           ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
+                  const SizedBox(height: 40),
                 ],
               ),
             ),
@@ -348,11 +344,32 @@ class DetailTagihanPage extends StatelessWidget {
     );
   }
 
+  void _share(BuildContext context) {
+    final shareText = '''
+💳 Detail Tagihan
+
+📋 Informasi Tagihan:
+• ID Tagihan: ${bill.id}
+• Jenis Tagihan: ${bill.title}
+• Periode: ${bill.period}
+• Jatuh Tempo: ${DateFormat('dd-MM-yyyy').format(bill.dueDate)}
+• Total Tagihan: ${_formatCurrency(bill.amount)}
+${bill.amountPaid != null && bill.amountPaid! > 0 ? '• Sudah Dibayar: ${_formatCurrency(bill.amountPaid!)}\n' : ''}${bill.outstanding > 0 ? '• Sisa Tagihan: ${_formatCurrency(bill.outstanding)}\n' : ''}
+• Status: ${_getBillStatusText(bill.status)}
+${bill.subtitle != null && bill.subtitle!.isNotEmpty ? '• Keterangan: ${bill.subtitle!}\n' : ''}
+📅 ${DateFormat('dd-MM-yyyy').format(DateTime.now())}, ${DateFormat('HH:mm').format(DateTime.now())} WIB
+
+Terima kasih telah menggunakan layanan Al-Hamra Mobile! 🙏
+    ''';
+    
+    Share.share(shareText);
+  }
+
   String _formatCurrency(int amount) {
     return 'Rp ${NumberFormat('#,###').format(amount)}';
   }
 
-  Widget _buildDetailRow(String label, String value) {
+  Widget _buildDetailRow(String label, String value, {bool isBlue = false}) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -369,9 +386,9 @@ class DetailTagihanPage extends StatelessWidget {
         Flexible(
           child: Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
-              color: Colors.black,
+              color: isBlue ? Colors.blue : Colors.black,
               fontWeight: FontWeight.w500,
             ),
             textAlign: TextAlign.right,
@@ -379,29 +396,6 @@ class DetailTagihanPage extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  void _share(BuildContext context) {
-    final String shareText = '''
-Detail Tagihan
-
-Informasi Tagihan:
-- ID: ${bill.id}
-- Jenis: ${bill.title}${bill.subtitle != null ? '\n- Keterangan: ${bill.subtitle}' : ''}
-- Periode: ${bill.period}
-- Status: ${_getBillStatusText(bill.status)}
-- Jatuh Tempo: ${DateFormat('dd MMMM yyyy').format(bill.dueDate)}
-
-Detail Pembayaran:
-- Total Tagihan: ${_formatCurrency(bill.amount)}
-${bill.amountPaid != null && bill.amountPaid! > 0 ? '- Sudah Dibayar: ${_formatCurrency(bill.amountPaid!)}' : ''}
-${bill.outstanding > 0 ? '- Sisa Tagihan: ${_formatCurrency(bill.outstanding)}' : ''}
-
-Tagihan dari Aplikasi Alhamra
-${DateFormat('dd-MM-yyyy, HH:mm').format(DateTime.now())} WIB
-''';
-
-    _showShareBottomSheet(context, shareText);
   }
 
   void _showShareBottomSheet(BuildContext parentContext, String shareText) {
