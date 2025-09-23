@@ -1,12 +1,11 @@
 import 'package:alhamra_1/features/shared/widgets/student_selection_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import '../../../core/data/student_data.dart';
 import '../../../core/models/aktivitas_model.dart';
 import '../../../core/utils/app_styles.dart';
 import '../../shared/widgets/index.dart';
-import '../widgets/aktivitas_category_filter.dart';
+import 'aktivitas_detail_page.dart';
 
 class AktivitasPage extends StatefulWidget {
   const AktivitasPage({super.key});
@@ -15,16 +14,16 @@ class AktivitasPage extends StatefulWidget {
   State<AktivitasPage> createState() => _AktivitasPageState();
 }
 
-class _AktivitasPageState extends State<AktivitasPage> {
+class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateMixin {
   // --- State Management ---
   late Map<String, StudentAktivitasProfile> _allAktivitasData;
   late StudentAktivitasProfile _selectedProfile;
   String _selectedStudentName = StudentData.defaultStudent;
   bool _isStudentOverlayVisible = false;
-  String? _expandedEntryId;
   late List<AktivitasEntry> _filteredEntries;
   final TextEditingController _searchController = TextEditingController();
 
+  late TabController _tabController;
   // --- Filter State ---
   String _selectedSortOrder = 'Terbaru';
   AktivitasType? _selectedTypeFilter;
@@ -37,12 +36,23 @@ class _AktivitasPageState extends State<AktivitasPage> {
     _generateMockData();
     _selectedProfile = _allAktivitasData[_selectedStudentName]!;
     _filteredEntries = _selectedProfile.entries;
-    _searchController.addListener(_filterAktivitasEntries);
+
+    final categories = [null, ...AktivitasType.values];
+    _tabController = TabController(length: categories.length, vsync: this);
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        setState(() {
+          _selectedTypeFilter = categories[_tabController.index];
+          _filterAktivitasEntries();
+        });
+      }
+    });
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _tabController.dispose();
     super.dispose();
   }
 
@@ -178,208 +188,213 @@ class _AktivitasPageState extends State<AktivitasPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
-          child: _buildSearchAndFilter(),
-        ),
-        const SizedBox(height: 8),
-        AktivitasCategoryFilter(
-          selectedCategory: _selectedTypeFilter,
-          onCategorySelected: (category) {
-            setState(() {
-              _selectedTypeFilter = category;
-              _filterAktivitasEntries();
-            });
-          },
-        ),
+        _buildTabBar(),
+        _buildFilterSection(),
         Expanded(
-          child: _filteredEntries.isEmpty
-              ? const Center(child: Text('Tidak ada data yang cocok.'))
-              : Container(
-                  margin: const EdgeInsets.fromLTRB(24, 16, 24, 0),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    itemCount: _filteredEntries.length,
-                    itemBuilder: (context, index) {
-                      final entry = _filteredEntries[index];
-                      return _buildAktivitasItem(entry);
-                    },
-                    separatorBuilder: (context, index) =>
-                        const Divider(height: 1, indent: 16, endIndent: 16),
-                  ),
-                ),
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              for (var _ in [null, ...AktivitasType.values]) _buildAktivitasList(),
+            ],
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildSearchAndFilter() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Riwayat Aktivitas',
-          style: AppStyles.sectionTitle(context)
-              .copyWith(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: 'Cari berdasarkan aktivitas',
-                  prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey.shade300),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey.shade300),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                ),
-              ),
-            ),
-            const SizedBox(width: 16),
-            TextButton.icon(
-              onPressed: _showFilterBottomSheet,
-              icon: const Icon(Icons.filter_list, size: 20),
-              label: const Text('Filter'),
-              style: TextButton.styleFrom(
-                foregroundColor: AppStyles.primaryColor,
-              ),
-            ),
-          ],
-        ),
-      ],
+  Widget _buildTabBar() {
+    final categories = [null, ...AktivitasType.values];
+    return Container(
+      color: Colors.white,
+      child: TabBar(
+        controller: _tabController,
+        isScrollable: true,
+        indicatorColor: AppStyles.primaryColor,
+        indicatorWeight: 2,
+        labelColor: AppStyles.primaryColor,
+        unselectedLabelColor: Colors.grey[600],
+        labelStyle: const TextStyle(
+            fontFamily: 'Poppins', fontSize: 16, fontWeight: FontWeight.w600),
+        unselectedLabelStyle: const TextStyle(
+            fontFamily: 'Poppins', fontSize: 16, fontWeight: FontWeight.w400),
+        tabs: categories.map((category) {
+          return Tab(text: _getLabelForCategory(category));
+        }).toList(),
+      ),
     );
   }
 
-  Widget _buildAktivitasItem(AktivitasEntry entry) {
-    final isExpanded = _expandedEntryId == entry.id;
-    final typeColor = _getColorForType(entry.tipe);
-    final typeText = _getTextForType(entry.tipe);
-    final typeIcon = _getIconForType(entry.tipe);
+  Widget _buildFilterSection() {
+    // Hanya tampilkan filter jika tab bukan "Semua"
+    if (_selectedTypeFilter == null) {
+      return const SizedBox.shrink();
+    }
 
-    return Column(
-      children: [
-        InkWell(
-          onTap: () {
-            setState(() {
-              _expandedEntryId = isExpanded ? null : entry.id;
-            });
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      color: const Color(0xFFF5F7FA),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            _selectedSortOrder,
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey[600],
+            ),
+          ),
+          GestureDetector(
+            onTap: _showFilterBottomSheet,
             child: Row(
               children: [
-                Icon(typeIcon, color: typeColor, size: 20),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        entry.judul,
-                        style: AppStyles.bodyText(context).copyWith(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        DateFormat('d MMMM yyyy', 'id_ID').format(entry.tanggal),
-                        style: AppStyles.bodyText(context).copyWith(
-                          color: Colors.grey[600],
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
+                Text(
+                  'Filter',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: AppStyles.primaryColor,
                   ),
                 ),
-                const SizedBox(width: 8),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      typeText,
-                      style: AppStyles.bodyText(context).copyWith(
-                        color: typeColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      entry.id,
-                      style: AppStyles.bodyText(context).copyWith(
-                        color: Colors.grey[600],
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(width: 8),
-                Icon(
-                  isExpanded ? Icons.expand_less : Icons.expand_more,
-                  color: Colors.grey,
+                const SizedBox(width: 6),
+                const Icon(
+                  Icons.tune,
+                  size: 18,
+                  color: AppStyles.primaryColor,
                 ),
               ],
             ),
           ),
-        ),
-        if (isExpanded) _buildAktivitasDetailCard(entry),
-      ],
-    );
-  }
-
-  Widget _buildAktivitasDetailCard(AktivitasEntry entry) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(36, 0, 16, 16),
-      decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(color: Colors.grey.shade200, width: 1),
-        ),
-      ),
-      child: Column(
-        children: [
-          const SizedBox(height: 16),
-          _buildDetailRow('Keterangan', entry.keterangan),
-          const SizedBox(height: 12),
-          _buildDetailRow('Pencatat', entry.pencatat),
         ],
       ),
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: AppStyles.bodyText(context).copyWith(color: Colors.grey[600]),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Text(
-            value,
-            textAlign: TextAlign.end,
-            style:
-                AppStyles.bodyText(context).copyWith(fontWeight: FontWeight.w600),
+  Widget _buildAktivitasList() {
+    return _filteredEntries.isEmpty
+        ? const Center(
+            child: Text('Tidak ada data yang cocok.',
+                style: TextStyle(color: Colors.grey)))
+        : ListView.builder(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+            itemCount: _filteredEntries.length,
+            itemBuilder: (context, index) {
+              final entry = _filteredEntries[index];
+              return _buildAktivitasCard(entry);
+            },
+          );
+  }
+
+  Widget _buildSearchAndFilter() {
+    // Logika filter kategori sekarang dipindahkan ke _buildAktivitasDetails
+    // untuk penataan layout yang lebih baik.
+    return const SizedBox.shrink();
+  }
+
+  Widget _buildAktivitasCard(AktivitasEntry entry) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          )
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Judul Kategori
+          Text(
+            "Status ${_getLabelForCategory(entry.tipe)}",
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+            ),
           ),
-        ),
-      ],
+          const Divider(height: 24),
+
+          // Isi Data
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Nama Santri
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("Nama Santri", style: TextStyle(color: Colors.black54, fontSize: 13)),
+                    const SizedBox(height: 4),
+                    Text(
+                      _selectedStudentName,
+                      style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 16),
+              // Tanggal
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  const Text("Tanggal", style: TextStyle(color: Colors.black54, fontSize: 13)),
+                  const SizedBox(height: 4),
+                  Text(
+                    DateFormat('d MMM yyyy', 'id_ID').format(entry.tanggal),
+                    style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Judul Aktivitas
+          const Text("Aktivitas", style: TextStyle(color: Colors.black54, fontSize: 13)),
+          const SizedBox(height: 4),
+          Text(
+            entry.judul,
+            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Tombol Detail
+          Align(
+            alignment: Alignment.centerRight,
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AktivitasDetailPage(
+                        entry: entry, studentName: _selectedStudentName),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppStyles.primaryColor,
+                foregroundColor: Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text("Lihat Detail"),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -633,7 +648,8 @@ class _AktivitasPageState extends State<AktivitasPage> {
     }
   }
 
-  String _getTextForType(AktivitasType type) {
+  String _getLabelForCategory(AktivitasType? type) {
+    if (type == null) return 'Semua';
     switch (type) {
       case AktivitasType.pelanggaran:
         return 'Pelanggaran';
@@ -642,7 +658,7 @@ class _AktivitasPageState extends State<AktivitasPage> {
       case AktivitasType.kesehatan:
         return 'Kesehatan';
       default:
-        return 'N/A';
+        return 'Lainnya';
     }
   }
 }
