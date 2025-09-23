@@ -117,27 +117,27 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppStyles.primaryColor,
-      appBar: CustomAppBar(
-        title: 'Aktivitas',
-        backgroundColor: Colors.transparent,
-      ),
       body: Stack(
         children: [
           Column(
             children: [
-              _buildStudentSelector(),
-              const SizedBox(height: 24),
+              // Blue header section
+              Container(
+                color: AppStyles.primaryColor,
+                child: SafeArea(
+                  bottom: false,
+                  child: Column(
+                    children: [
+                      _buildHeader(),
+                      _buildStudentSelector(),
+                    ],
+                  ),
+                ),
+              ),
+              // White content section
               Expanded(
                 child: Container(
-                  width: double.infinity,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFF5F7FA),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30),
-                    ),
-                  ),
+                  color: Colors.white,
                   child: _buildAktivitasDetails(),
                 ),
               ),
@@ -160,6 +160,18 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
               searchHint: 'Cari santri...',
               avatarUrl: StudentData.getStudentAvatar(_selectedStudentName),
             ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text('Aktivitas', style: AppStyles.heading1(context)),
         ],
       ),
     );
@@ -191,11 +203,14 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
         _buildTabBar(),
         _buildFilterSection(),
         Expanded(
-          child: TabBarView(
-            controller: _tabController,
-            children: [
-              for (var _ in [null, ...AktivitasType.values]) _buildAktivitasList(),
-            ],
+          child: Container(
+            color: const Color(0xFFF5F7FA),
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                for (var _ in [null, ...AktivitasType.values]) _buildAktivitasList(),
+              ],
+            ),
           ),
         ),
       ],
@@ -232,7 +247,6 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      color: const Color(0xFFF5F7FA),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
