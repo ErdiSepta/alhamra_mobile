@@ -85,6 +85,7 @@ class ProfilPage extends StatelessWidget {
                       MaterialPageRoute(
                           builder: (context) => const LoginScreen()),
                       (Route<dynamic> route) => false,
+
                     );
                   },
                 ),
@@ -92,6 +93,7 @@ class ProfilPage extends StatelessWidget {
             ),
     );
   }
+  
 
   Widget _buildProfileInfoRow(
     BuildContext context,

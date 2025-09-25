@@ -13,61 +13,165 @@ class BantuanScreen extends StatelessWidget {
         backgroundColor: AppStyles.primaryColor,
         foregroundColor: Colors.white,
       ),
-      body: ListView(
+      body: SingleChildScrollView(
         padding: AppStyles.getResponsivePadding(context),
-        children: const [
-          FaqItem(
-            question: 'Bagaimana cara mendapatkan akun aplikasi ini?',
-            answer:
-                '1. Akun untuk masuk ke aplikasi IBS Al-Hamra tidak dibuat secara mandiri oleh pengguna.\n'
-                '2. Setiap username dan password hanya bisa diberikan oleh administrator resmi aplikasi.\n'
-                '3. Jika Anda belum menerima akun, silakan hubungi admin melalui WhatsApp di nomor berikut: 0894-8347-387',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header Time (9:41) - biasanya ini status bar, jadi bisa diabaikan
+            // atau dibuat sebagai decorative element
+            
+            // Section: Cari jawaban atau hubungi kami
+            _buildHelpSection(context),
+            
+            const SizedBox(height: 24),
+            
+            // Section: Topik Populer
+            _buildPopularTopics(context),
+            
+            const SizedBox(height: 24),
+            
+            // Section: Hubungi Kami
+            _buildContactSection(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHelpSection(BuildContext context) {
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.only(bottom: 16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppStyles.getCardBorderRadius(context)),
+      ),
+      child: Padding(
+        padding: AppStyles.getResponsivePadding(context),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Cari jawaban atau hubungi kami',
+              style: AppStyles.bodyText(context).copyWith(
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: 12),
+            _buildChecklistItem(context, 'Cart bantuan ...'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPopularTopics(BuildContext context) {
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.only(bottom: 16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppStyles.getCardBorderRadius(context)),
+      ),
+      child: Padding(
+        padding: AppStyles.getResponsivePadding(context),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Topik Populer',
+              style: AppStyles.bodyText(context).copyWith(
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: 12),
+            _buildChecklistItem(context, 'Bagaimana cara mengganti kata sandi?'),
+            _buildChecklistItem(context, 'Bagaimana cara membayar tagihan?'),
+            _buildChecklistItem(context, 'Melibat Progress Tahfidz Anak'),
+            _buildChecklistItem(context, 'Apa itu Mutabalah?'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContactSection(BuildContext context) {
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.only(bottom: 16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppStyles.getCardBorderRadius(context)),
+      ),
+      child: Padding(
+        padding: AppStyles.getResponsivePadding(context),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Hubungi Kami',
+              style: AppStyles.bodyText(context).copyWith(
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: 12),
+            _buildContactItem(context, Icons.phone, 'Telepon : 0812xxxxxx'),
+            _buildContactItem(context, Icons.email, 'Email : info@ibsaihamra.sch.id'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildChecklistItem(BuildContext context, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        children: [
+          Container(
+            width: 20,
+            height: 20,
+            margin: const EdgeInsets.only(right: 12),
+            decoration: BoxDecoration(
+              border: Border.all(color: AppStyles.primaryColor),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: const Icon(
+              Icons.check,
+              size: 14,
+              color: Colors.transparent, // Awalnya transparan
+            ),
           ),
-          FaqItem(
-            question:
-                'Saya lupa password akun saya, bagaimana cara mengatasinya?',
-            answer:
-                'Jika Anda tidak bisa mengingat password, tidak tersedia fitur reset otomatis di aplikasi ini. Untuk melakukan reset password, silakan hubungi langsung admin melalui WhatsApp: 0894-8347-387. Sebutkan nama lengkap Anda dan instansi/unit terkait agar proses verifikasi berjalan cepat.',
+          Expanded(
+            child: Text(
+              text,
+              style: AppStyles.bodyText(context).copyWith(
+                color: Colors.grey[700],
+              ),
+            ),
           ),
-          FaqItem(
-            question: 'Saya tidak bisa login ke aplikasi, apa penyebabnya?',
-            answer:
-                'Ada beberapa hal yang perlu diperiksa:\n'
-                '1. Pastikan Anda menggunakan username dan password yang benar, sesuai dengan yang diberikan oleh admin.\n'
-                '2. Periksa apakah Anda tidak mengaktifkan caps lock, dan perhatikan huruf besar/kecil.\n'
-                '3. Pastikan perangkat Anda terhubung dengan internet.\n'
-                '4. Jika semua sudah benar namun tetap gagal, segera hubungi admin di 0894-8347-387.',
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContactItem(BuildContext context, IconData icon, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            size: 20,
+            color: AppStyles.primaryColor,
           ),
-          FaqItem(
-            question:
-                'Aplikasi tidak bisa dibuka atau force close (keluar sendiri)?',
-            answer:
-                'Ada beberapa hal yang perlu diperiksa:\n'
-                '1. Tutup aplikasi dan buka ulang.\n'
-                '2. Restart perangkat Anda.\n'
-                '3. Pastikan aplikasi IBS Al-Hamra sudah diperbarui ke versi terbaru.\n'
-                '4. Jika masih bermasalah, coba hapus cache aplikasi di pengaturan perangkat.',
-          ),
-          FaqItem(
-            question: 'Apakah saya bisa mengganti atau membuat akun sendiri?',
-            answer:
-                'Tidak bisa. Seluruh akun hanya dibuat oleh administrator pusat untuk menjaga keamanan sistem dan data pengguna. Jika Anda membutuhkan akses baru (misalnya karena pindah unit atau ganti perangkat), silakan ajukan ke admin 0894-8347-387.',
-          ),
-          FaqItem(
-            question: 'Apakah aplikasi bisa digunakan tanpa koneksi internet?',
-            answer:
-                'Tidak. Aplikasi IBS Al-Hamra membutuhkan koneksi internet aktif untuk login dan mengakses data. Pastikan Anda terhubung dengan jaringan yang stabil saat menggunakan aplikasi.',
-          ),
-          FaqItem(
-            question: 'Apakah saya boleh login di beberapa perangkat sekaligus?',
-            answer:
-                'Sangat tidak disarankan. Untuk menjaga keamanan dan konsistensi data, sebaiknya Anda hanya login di satu perangkat saja. Jika ingin mengganti perangkat, logout terlebih dahulu dari perangkat sebelumnya, lalu login ulang di perangkat baru.',
-          ),
-          FaqItem(
-            question:
-                'Saya mengalami kendala lain yang tidak disebutkan di atas. Apa yang harus saya lakukan?',
-            answer:
-                'Jika ada masalah atau pertanyaan lain yang belum terjawab, silakan langsung hubungi admin melalui WhatsApp: 0894-8347-387. Tim admin siap membantu Anda selama jam kerja.',
+          const SizedBox(width: 12),
+          Text(
+            text,
+            style: AppStyles.bodyText(context).copyWith(
+              color: Colors.grey[700],
+            ),
           ),
         ],
       ),
@@ -75,84 +179,65 @@ class BantuanScreen extends StatelessWidget {
   }
 }
 
-class FaqItem extends StatefulWidget {
-  final String question;
-  final String answer;
+// Jika Anda masih ingin mempertahankan FAQ functionality, 
+// bisa dibuat sebagai screen terpisah atau dengan toggle
+class InteractiveChecklistItem extends StatefulWidget {
+  final String text;
+  final bool isInteractive;
 
-  const FaqItem({
+  const InteractiveChecklistItem({
     super.key,
-    required this.question,
-    required this.answer,
+    required this.text,
+    this.isInteractive = false,
   });
 
   @override
-  State<FaqItem> createState() => _FaqItemState();
+  State<InteractiveChecklistItem> createState() => _InteractiveChecklistItemState();
 }
 
-class _FaqItemState extends State<FaqItem> {
-  bool _isExpanded = false;
+class _InteractiveChecklistItemState extends State<InteractiveChecklistItem> {
+  bool _isChecked = false;
 
   @override
   Widget build(BuildContext context) {
-    final answerParts = widget.answer.split('\n').where((s) => s.isNotEmpty).toList();
-
-    return Card(
-      elevation: 2,
-      margin: EdgeInsets.symmetric(
-        vertical: AppStyles.getResponsiveSpacing(context, small: 6.0, medium: 7.0, large: 8.0),
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppStyles.getCardBorderRadius(context)),
-      ),
-      child: InkWell(
-        onTap: () {
-          setState(() {
-            _isExpanded = !_isExpanded;
-          });
-        },
-        child: Padding(
-          padding: AppStyles.getResponsivePadding(context),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      widget.question,
-                      style: AppStyles.bodyText(context).copyWith(fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                  Icon(
-                    _isExpanded ? Icons.expand_less : Icons.expand_more,
-                    color: AppStyles.primaryColor,
-                  ),
-                ],
-              ),
-              if (_isExpanded) ...[
-                const SizedBox(height: 12.0),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: answerParts.map((part) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: Text(
-                        part,
-                        style: AppStyles.bodyText(context).copyWith(
-                          color: Colors.grey[700],
-                          height: 1.5,
-                        ),
-                      ),
-                    );
-                  }).toList(),
+    return GestureDetector(
+      onTap: widget.isInteractive ? () {
+        setState(() {
+          _isChecked = !_isChecked;
+        });
+      } : null,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Row(
+          children: [
+            Container(
+              width: 20,
+              height: 20,
+              margin: const EdgeInsets.only(right: 12),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: _isChecked ? AppStyles.primaryColor : AppStyles.primaryColor,
                 ),
-              ],
-            ],
-          ),
+                borderRadius: BorderRadius.circular(4),
+                color: _isChecked ? AppStyles.primaryColor : Colors.transparent,
+              ),
+              child: Icon(
+                Icons.check,
+                size: 14,
+                color: _isChecked ? Colors.white : Colors.transparent,
+              ),
+            ),
+            Expanded(
+              child: Text(
+                widget.text,
+                style: AppStyles.bodyText(context).copyWith(
+                  color: Colors.grey[700],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
-

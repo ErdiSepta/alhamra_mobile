@@ -1,69 +1,49 @@
-import'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../../../core/models/aktivitas_model.dart';
 import '../../../core/utils/app_styles.dart';
 
+/// Widget filter kategori aktivitas yang dapat dikonfigurasi.
 class AktivitasCategoryFilter extends StatelessWidget {
-  final AktivitasType? selectedCategory;
   final ValueChanged<AktivitasType?> onCategorySelected;
-
-  // Baru: atur posisi dan jarak
-  final AlignmentGeometry alignment;
-  final EdgeInsetsGeometry padding;
+  final TabController tabController;
+  final List<AktivitasType?> categories;
 
   const AktivitasCategoryFilter({
     super.key,
-    required this.selectedCategory,
     required this.onCategorySelected,
-    this.alignment = Alignment.centerLeft, // default kiri
-    this.padding = const EdgeInsets.symmetric(horizontal: 16.0),
+    required this.tabController,
+    required this.categories,
   });
 
   @override
   Widget build(BuildContext context) {
-    final List<AktivitasType?> categories = [null, ...AktivitasType.values];
-
-    return DefaultTabController(
-      length: categories.length,
-      initialIndex: _getInitialIndex(categories),
-      child: Padding(
-        padding: padding,
-        child: Align(
-          alignment: alignment,
-          child: TabBar(
-            isScrollable: true,
-            indicatorColor: AppStyles.primaryColor,
-            indicatorWeight: 2,
-            labelColor: AppStyles.primaryColor,
-            unselectedLabelColor: Colors.grey[600],
-            labelStyle: const TextStyle(fontWeight: FontWeight.w600),
-            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w400),
-            onTap: (index) {
-              onCategorySelected(categories[index]);
-            },
-            tabs: categories.map((category) {
-              return Tab(text: _getLabelForCategory(category));
-            }).toList(),
-          ),
-        ),
+    return Container(
+      color: Colors.white,
+      child: TabBar(
+        controller: tabController,
+        isScrollable: true,
+        indicatorColor: AppStyles.primaryColor,
+        indicatorWeight: 2,
+        labelColor: AppStyles.primaryColor,
+        unselectedLabelColor: Colors.grey[600],
+        labelStyle: const TextStyle(
+            fontFamily: 'Poppins', fontSize: 16, fontWeight: FontWeight.w600),
+        unselectedLabelStyle: const TextStyle(
+            fontFamily: 'Poppins', fontSize: 16, fontWeight: FontWeight.w400),
+        onTap: (index) {
+          // Panggil callback onCategorySelected yang sudah ada di listener TabController
+          // di halaman utama untuk menghindari panggilan ganda.
+        },
+        tabs: categories.map((category) {
+          return Tab(text: _getLabelForCategory(category));
+        }).toList(),
       ),
     );
   }
 
-  int _getInitialIndex(List<AktivitasType?> categories) {
-    return selectedCategory == null
-        ? 0
-        : categories.indexOf(selectedCategory);
-  }
-
+  /// Mendapatkan label dari enum atau mengembalikan "Semua" jika null.
   String _getLabelForCategory(AktivitasType? category) {
-    if (category == null) return 'Semua Aktivitas';
-    switch (category) {
-      case AktivitasType.pelanggaran:
-        return 'Pelanggaran';
-      case AktivitasType.perizinan:
-        return 'Perijinan';
-      case AktivitasType.kesehatan:
-        return 'Kesehatan';
-    }
+    // Menggunakan extension yang sudah dibuat
+    return category?.label ?? 'Semua';
   }
 }

@@ -5,6 +5,11 @@ import '../../../core/data/student_data.dart';
 import '../../../core/models/aktivitas_model.dart';
 import '../../../core/utils/app_styles.dart';
 import '../../shared/widgets/index.dart';
+import 'aktivitas_list_kesehatan.dart';
+import 'aktivitas_list_perizinan.dart';
+import 'aktivitas_list_pelanggaran.dart';
+import 'aktivitas_list_all.dart';
+import '../widgets/aktivitas_category_filter.dart';
 import 'aktivitas_detail_page.dart';
 
 class AktivitasPage extends StatefulWidget {
@@ -22,7 +27,6 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
   bool _isStudentOverlayVisible = false;
   late List<AktivitasEntry> _filteredEntries;
   final TextEditingController _searchController = TextEditingController();
-
   late TabController _tabController;
   // --- Filter State ---
   String _selectedSortOrder = 'Terbaru';
@@ -200,42 +204,32 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildTabBar(),
+        AktivitasCategoryFilter(
+          categories: const [null, ...AktivitasType.values],
+          tabController: _tabController,
+          onCategorySelected: (category) {
+            // Logika sudah ditangani oleh listener TabController
+            // _tabController.animateTo([null, ...AktivitasType.values].indexOf(category));
+          },
+        ),
         _buildFilterSection(),
         Expanded(
           child: Container(
             color: const Color(0xFFF5F7FA),
             child: TabBarView(
-              controller: _tabController,
-              children: [
-                for (var _ in [null, ...AktivitasType.values]) _buildAktivitasList(),
-              ],
-            ),
+  controller: _tabController,
+  children: [
+    AktivitasListAll(entries: _selectedProfile.entries, studentName: _selectedStudentName),
+    AktivitasListPelanggaran(entries: _selectedProfile.entries, studentName: _selectedStudentName),
+    AktivitasListPerizinan(entries: _selectedProfile.entries, studentName: _selectedStudentName),
+    AktivitasListKesehatan(entries: _selectedProfile.entries, studentName: _selectedStudentName),
+  ],
+)
+
+
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildTabBar() {
-    final categories = [null, ...AktivitasType.values];
-    return Container(
-      color: Colors.white,
-      child: TabBar(
-        controller: _tabController,
-        isScrollable: true,
-        indicatorColor: AppStyles.primaryColor,
-        indicatorWeight: 2,
-        labelColor: AppStyles.primaryColor,
-        unselectedLabelColor: Colors.grey[600],
-        labelStyle: const TextStyle(
-            fontFamily: 'Poppins', fontSize: 16, fontWeight: FontWeight.w600),
-        unselectedLabelStyle: const TextStyle(
-            fontFamily: 'Poppins', fontSize: 16, fontWeight: FontWeight.w400),
-        tabs: categories.map((category) {
-          return Tab(text: _getLabelForCategory(category));
-        }).toList(),
-      ),
     );
   }
 
@@ -328,7 +322,7 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
         children: [
           // Judul Kategori
           Text(
-            "Status ${_getLabelForCategory(entry.tipe)}",
+            "Status ${entry.tipe.label}",
             style: const TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 16,
@@ -663,16 +657,6 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
   }
 
   String _getLabelForCategory(AktivitasType? type) {
-    if (type == null) return 'Semua';
-    switch (type) {
-      case AktivitasType.pelanggaran:
-        return 'Pelanggaran';
-      case AktivitasType.perizinan:
-        return 'Perizinan';
-      case AktivitasType.kesehatan:
-        return 'Kesehatan';
-      default:
-        return 'Lainnya';
-    }
+    return type?.label ?? 'Semua';
   }
 }

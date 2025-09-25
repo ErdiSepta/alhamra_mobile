@@ -1,10 +1,51 @@
 import 'dart:math';
+import 'package:alhamra_1/core/utils/app_styles.dart';
+import 'package:flutter/material.dart';
 
 // Enum for the type of activity
 enum AktivitasType {
   pelanggaran,
   perizinan,
   kesehatan,
+}
+
+/// Extension untuk menyediakan properti tambahan pada enum AktivitasType.
+extension AktivitasTypeExtension on AktivitasType {
+  /// Mengembalikan label string yang sesuai untuk setiap tipe.
+  String get label {
+    switch (this) {
+      case AktivitasType.pelanggaran:
+        return 'Pelanggaran';
+      case AktivitasType.perizinan:
+        return 'Perizinan';
+      case AktivitasType.kesehatan:
+        return 'Kesehatan';
+    }
+  }
+
+  /// Mengembalikan warna yang sesuai untuk setiap tipe.
+  Color get color {
+    switch (this) {
+      case AktivitasType.pelanggaran:
+        return Colors.red;
+      case AktivitasType.perizinan:
+        return Colors.blue;
+      case AktivitasType.kesehatan:
+        return Colors.green;
+    }
+  }
+
+  /// Mengembalikan ikon yang sesuai untuk setiap tipe.
+  IconData get icon {
+    switch (this) {
+      case AktivitasType.pelanggaran:
+        return Icons.warning_amber_rounded;
+      case AktivitasType.perizinan:
+        return Icons.check_circle_outline_rounded;
+      case AktivitasType.kesehatan:
+        return Icons.local_hospital_outlined;
+    }
+  }
 }
 
 // Model for a single activity entry
