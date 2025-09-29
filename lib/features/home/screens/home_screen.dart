@@ -1,5 +1,6 @@
 import 'package:alhamra_1/features/home/screens/menu_pages.dart';
 import 'package:alhamra_1/features/aktivitas/screens/aktivitas_page.dart';
+import 'package:alhamra_1/features/beranda/beranda_all_page.dart';
 import 'package:alhamra_1/features/payment/screens/bayar_pages.dart';
 import 'package:alhamra_1/features/profile/screens/profile_page.dart';
 
@@ -59,10 +60,7 @@ class HomeScreen extends StatelessWidget {
       return [
         const BerandaPage(), // Menu (shows Beranda content)
         const StatusPage(), // Status
-        const PlaceholderPage(
-          title: 'Beranda',
-          icon: Icons.home,
-        ), // Beranda (center)
+        const BerandaAllPage(), // Beranda (center) - Now using the new overview page
         const AktivitasPage(), // Aktivitas
         ProfilePage(), // Akun
       ];

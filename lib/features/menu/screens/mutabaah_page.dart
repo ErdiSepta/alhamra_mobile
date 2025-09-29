@@ -26,7 +26,6 @@ class _MutabaahPageState extends State<MutabaahPage> {
 
   // --- Filter State ---
   String _selectedSortOrder = 'Terbaru';
-  MutabaahStatus? _selectedStatusFilter;
   DateTime? _startDate;
   DateTime? _endDate;
 
@@ -35,7 +34,7 @@ class _MutabaahPageState extends State<MutabaahPage> {
     super.initState();
     _generateMockData();
     _selectedProfile = _allMutabaahData[_selectedStudentName]!;
-    _filteredEntries = _selectedProfile.entries;
+    _filterMutabaahEntries();
     _searchController.addListener(_filterMutabaahEntries);
   }
 
@@ -59,7 +58,6 @@ class _MutabaahPageState extends State<MutabaahPage> {
       // Reset filters and search when student changes
       _searchController.clear();
       _selectedSortOrder = 'Terbaru';
-      _selectedStatusFilter = null;
       _startDate = null;
       _endDate = null;
       _filterMutabaahEntries(); // Apply reset filters
@@ -70,8 +68,6 @@ class _MutabaahPageState extends State<MutabaahPage> {
     final query = _searchController.text.toLowerCase();
     var filtered = _selectedProfile.entries.where((entry) {
       final searchMatch = entry.kegiatan.toLowerCase().contains(query);
-      final statusMatch =
-          _selectedStatusFilter == null || entry.status == _selectedStatusFilter;
 
       // Normalize dates to ignore time component for correct comparison
       final entryDate =
@@ -87,7 +83,7 @@ class _MutabaahPageState extends State<MutabaahPage> {
           startDate == null || !entryDate.isBefore(startDate);
       final isBeforeEndDate = endDate == null || !entryDate.isAfter(endDate);
 
-      return searchMatch && statusMatch && isAfterStartDate && isBeforeEndDate;
+      return searchMatch && isAfterStartDate && isBeforeEndDate;
     }).toList();
 
     // Sorting
@@ -254,9 +250,6 @@ class _MutabaahPageState extends State<MutabaahPage> {
 
   Widget _buildMutabaahItem(MutabaahEntry entry) {
     final isExpanded = _expandedEntryId == entry.id;
-    final statusColor = _getColorForStatus(entry.status);
-    final statusText = _getTextForStatus(entry.status);
-    final statusIcon = _getIconForStatus(entry.status);
 
     return Column(
       children: [
@@ -270,8 +263,7 @@ class _MutabaahPageState extends State<MutabaahPage> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
-                Icon(statusIcon, color: statusColor, size: 20),
-                const SizedBox(width: 12),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -298,23 +290,7 @@ class _MutabaahPageState extends State<MutabaahPage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      statusText,
-                      style: AppStyles.bodyText(context).copyWith(
-                        color: statusColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      entry.id,
-                      style: AppStyles.bodyText(context).copyWith(
-                        color: Colors.grey[600],
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
+                    
                 ),
                 const SizedBox(width: 8),
                 Icon(
@@ -374,7 +350,6 @@ class _MutabaahPageState extends State<MutabaahPage> {
   void _showFilterBottomSheet() {
     // Temporary state for the bottom sheet
     String tempSortOrder = _selectedSortOrder;
-    MutabaahStatus? tempStatus = _selectedStatusFilter;
     DateTime? tempStartDate = _startDate;
     DateTime? tempEndDate = _endDate;
 
@@ -417,10 +392,6 @@ class _MutabaahPageState extends State<MutabaahPage> {
                               () => setModalState(() => tempSortOrder = 'Terlama'))),
                     ],
                   ),
-                  const SizedBox(height: 24),
-                  _buildStatusDropdown(tempStatus, (value) {
-                    setModalState(() => tempStatus = value);
-                  }),
                   const SizedBox(height: 16),
                   Row(
                     children: [
@@ -447,7 +418,6 @@ class _MutabaahPageState extends State<MutabaahPage> {
                           onPressed: () {
                             setModalState(() {
                               tempSortOrder = 'Terbaru';
-                              tempStatus = null;
                               tempStartDate = null;
                               tempEndDate = null;
                             });
@@ -465,7 +435,6 @@ class _MutabaahPageState extends State<MutabaahPage> {
                           onPressed: () {
                             setState(() {
                               _selectedSortOrder = tempSortOrder;
-                              _selectedStatusFilter = tempStatus;
                               _startDate = tempStartDate;
                               _endDate = tempEndDate;
                               _filterMutabaahEntries();
@@ -498,32 +467,6 @@ class _MutabaahPageState extends State<MutabaahPage> {
       child: Text(label,
           style:
               TextStyle(color: isSelected ? AppStyles.primaryColor : Colors.black87)),
-    );
-  }
-
-  Widget _buildStatusDropdown(
-      MutabaahStatus? selectedValue, ValueChanged<MutabaahStatus?> onChanged) {
-    List<DropdownMenuItem<MutabaahStatus?>> items = [
-      const DropdownMenuItem<MutabaahStatus?>(value: null, child: Text('Semua')),
-    ];
-
-    items.addAll(MutabaahStatus.values.map((status) {
-      return DropdownMenuItem<MutabaahStatus?>(
-        value: status,
-        child: Text(_getTextForStatus(status)),
-      );
-    }).toList());
-
-    return DropdownButtonFormField<MutabaahStatus?>(
-      value: selectedValue,
-      items: items,
-      onChanged: onChanged,
-      decoration: InputDecoration(
-        labelText: 'Pilih Status',
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-      ),
     );
   }
 
@@ -626,44 +569,5 @@ class _MutabaahPageState extends State<MutabaahPage> {
         ),
       ),
     );
-  }
-
-  Color _getColorForStatus(MutabaahStatus status) {
-    switch (status) {
-      case MutabaahStatus.dilaksanakan:
-        return Colors.green.shade600;
-      case MutabaahStatus.tidakDilaksanakan:
-        return Colors.red.shade600;
-      case MutabaahStatus.izin:
-        return Colors.orange.shade700;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  IconData _getIconForStatus(MutabaahStatus status) {
-    switch (status) {
-      case MutabaahStatus.dilaksanakan:
-        return Icons.check_circle_outline;
-      case MutabaahStatus.tidakDilaksanakan:
-        return Icons.highlight_off;
-      case MutabaahStatus.izin:
-        return Icons.info_outline;
-      default:
-        return Icons.help_outline;
-    }
-  }
-
-  String _getTextForStatus(MutabaahStatus status) {
-    switch (status) {
-      case MutabaahStatus.dilaksanakan:
-        return 'Dilaksanakan';
-      case MutabaahStatus.tidakDilaksanakan:
-        return 'Tidak';
-      case MutabaahStatus.izin:
-        return 'Izin';
-      default:
-        return 'N/A';
-    }
   }
 }

@@ -5,6 +5,7 @@ import '../../../core/models/nilai_model.dart';
 import '../../../core/utils/app_styles.dart';
 import '../../shared/widgets/index.dart';
 import '../../shared/widgets/student_selection_widget.dart';
+import 'nilai_detail_page.dart';
 
 class NilaiPage extends StatefulWidget {
   const NilaiPage({super.key});
@@ -219,7 +220,12 @@ class _NilaiPageState extends State<NilaiPage> {
                     title: Text(subject.name, style: AppStyles.bodyText(context)),
                     trailing:
                         const Icon(Icons.chevron_right, color: Colors.grey),
-                    onTap: () { /* TODO: Navigate to subject detail page */ },
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => NilaiDetailPage(
+                            subject: subject, studentName: _selectedProfile.namaLengkap),
+                      ));
+                    },
                   ),
                   if (subjects.last != subject)
                     const Divider(height: 1, indent: 16, endIndent: 16),
