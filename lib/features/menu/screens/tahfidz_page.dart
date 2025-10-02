@@ -1,11 +1,11 @@
-import 'package:alhamra_1/features/shared/widgets/student_selection_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import '../../../core/data/student_data.dart';
 import '../../../core/models/tahfidz_model.dart';
 import '../../../core/utils/app_styles.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../shared/widgets/index.dart';
+import '../../shared/widgets/student_selection_widget.dart';
 
 class TahfidzPage extends StatefulWidget {
   const TahfidzPage({super.key});
@@ -134,7 +134,7 @@ class _TahfidzPageState extends State<TahfidzPage> {
           if (_isStudentOverlayVisible)
             SearchOverlayWidget(
               isVisible: _isStudentOverlayVisible,
-              title: 'Pilih Santri',
+              title: AppLocalizations.of(context).pilihSantri,
               items: StudentData.allStudents,
               selectedItem: _selectedStudentName,
               onItemSelected: (nama) {
@@ -145,7 +145,7 @@ class _TahfidzPageState extends State<TahfidzPage> {
                 });
               },
               onClose: () => setState(() => _isStudentOverlayVisible = false),
-              searchHint: 'Cari santri...',
+              searchHint: AppLocalizations.of(context).cariSantri,
               avatarUrl: StudentData.getStudentAvatar(_selectedStudentName),
             ),
         ],

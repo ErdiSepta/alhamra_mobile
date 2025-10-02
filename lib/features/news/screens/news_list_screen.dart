@@ -1,11 +1,12 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import '../../../core/models/article_model.dart';
-import '../../../core/services/news_service.dart';
 import '../../../core/utils/app_styles.dart';
-import '../../shared/widgets/status_app_bar.dart';
+import '../../../core/services/news_service.dart';
+import '../../../core/models/article_model.dart';
+import '../../../core/localization/app_localizations.dart';
 import 'news_detail_screen.dart';
+import '../../shared/widgets/status_app_bar.dart';
 
 class NewsListScreen extends StatefulWidget {
   const NewsListScreen({super.key});
@@ -41,7 +42,7 @@ class _NewsListScreenState extends State<NewsListScreen> {
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal memuat berita: $e')),
+          SnackBar(content: Text('Failed to load news: $e')),
         );
       }
     }
@@ -165,7 +166,7 @@ class _NewsListScreenState extends State<NewsListScreen> {
                                   ),
                                   const SizedBox(height: 16),
                                   Text(
-                                    'Tidak ada berita',
+                                    AppLocalizations.of(context).tidakAdaData,
                                     style: GoogleFonts.poppins(
                                       fontSize: AppStyles.getResponsiveFontSize(context, small: 14.0, medium: 15.0, large: 16.0),
                                       fontWeight: FontWeight.w500,
@@ -174,7 +175,7 @@ class _NewsListScreenState extends State<NewsListScreen> {
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    'Tarik ke bawah untuk refresh',
+                                    'Pull to refresh',
                                     style: GoogleFonts.poppins(
                                       fontSize: AppStyles.getResponsiveFontSize(context, small: 12, medium: 13, large: 14),
                                       color: Colors.grey[500],
@@ -252,7 +253,7 @@ class _NewsListScreenState extends State<NewsListScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Gambar tidak tersedia',
+                        'Image not available',
                         style: GoogleFonts.poppins(
                           fontSize: AppStyles.getResponsiveFontSize(context, small: 10.0, medium: 11.0, large: 12.0),
                           color: Colors.grey[500],
@@ -351,7 +352,7 @@ class _NewsListScreenState extends State<NewsListScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              'Baca Selengkapnya',
+                              AppLocalizations.of(context).lihatDetail,
                               style: GoogleFonts.poppins(
                                 fontSize: AppStyles.getResponsiveFontSize(context, small: 12, medium: 13, large: 14),
                                 fontWeight: FontWeight.w500,

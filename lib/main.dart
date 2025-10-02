@@ -5,8 +5,10 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'core/services/seeder_service.dart';
+import 'core/services/language_service.dart';
 import 'core/providers/auth_provider.dart';
 import 'core/utils/app_styles.dart';
+import 'core/localization/app_localizations.dart';
 import 'app/config/routes.dart';
 
 void main() async {
@@ -21,19 +23,32 @@ void main() async {
     ),
   );
   
+  // Initialize services
+  final languageService = LanguageService();
+  await languageService.initializeLanguage();
+  
   await SeederService().seedAll();
   await initializeDateFormatting('id_ID', null);
-  runApp(const MyApp());
+  await initializeDateFormatting('en_US', null);
+  
+  runApp(MyApp(languageService: languageService));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final LanguageService languageService;
+  
+  const MyApp({super.key, required this.languageService});
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => AuthProvider())],
-      child: MaterialApp(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider.value(value: languageService),
+      ],
+      child: Consumer<LanguageService>(
+        builder: (context, languageService, child) {
+          return MaterialApp(
         title: 'Alhamra App',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
@@ -53,16 +68,18 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [
-          Locale('id', 'ID'),
-        ],
-        initialRoute: AppRoutes.splash,
-        routes: AppRoutes.routes,
+            locale: languageService.currentLocale,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: AppLocalizations.supportedLocales,
+            initialRoute: AppRoutes.splash,
+            routes: AppRoutes.routes,
+          );
+        },
       ),
     );
   }

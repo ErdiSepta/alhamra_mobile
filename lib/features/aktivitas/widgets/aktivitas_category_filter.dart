@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/models/aktivitas_model.dart';
 import '../../../core/utils/app_styles.dart';
+import '../../../core/localization/app_localizations.dart';
 
 /// Widget filter kategori aktivitas yang dapat dikonfigurasi.
 class AktivitasCategoryFilter extends StatelessWidget {
@@ -35,15 +36,26 @@ class AktivitasCategoryFilter extends StatelessWidget {
           // di halaman utama untuk menghindari panggilan ganda.
         },
         tabs: categories.map((category) {
-          return Tab(text: _getLabelForCategory(category));
+          return Tab(text: _getLabelForCategory(category, context));
         }).toList(),
       ),
     );
   }
 
   /// Mendapatkan label dari enum atau mengembalikan "Semua" jika null.
-  String _getLabelForCategory(AktivitasType? category) {
-    // Menggunakan extension yang sudah dibuat
-    return category?.label ?? 'Semua';
+  String _getLabelForCategory(AktivitasType? category, BuildContext context) {
+    if (category == null) {
+      return AppLocalizations.of(context).semua;
+    }
+    
+    // Menggunakan translations untuk setiap kategori
+    switch (category) {
+      case AktivitasType.pelanggaran:
+        return AppLocalizations.of(context).pelanggaran;
+      case AktivitasType.perizinan:
+        return AppLocalizations.of(context).perizinan;
+      case AktivitasType.kesehatan:
+        return AppLocalizations.of(context).kesehatan;
+    }
   }
 }

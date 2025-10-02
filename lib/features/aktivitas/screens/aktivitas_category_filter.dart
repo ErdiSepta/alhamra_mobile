@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/models/aktivitas_model.dart';
 import '../../../core/utils/app_styles.dart';
+import '../../../core/localization/app_localizations.dart';
 
 class AktivitasCategoryFilter extends StatelessWidget {
   final AktivitasType? selectedCategory;
@@ -23,7 +24,7 @@ class AktivitasCategoryFilter extends StatelessWidget {
       child: Row(
         children: categories.map((category) {
           final isSelected = selectedCategory == category;
-          final String label = _getLabelForCategory(category);
+          final String label = _getLabelForCategory(context, category);
 
           return Padding(
             padding: const EdgeInsets.only(right: 8.0),
@@ -52,12 +53,13 @@ class AktivitasCategoryFilter extends StatelessWidget {
     );
   }
 
-  String _getLabelForCategory(AktivitasType? category) {
-    if (category == null) return 'Semua Status';
+  String _getLabelForCategory(BuildContext context, AktivitasType? category) {
+    final localizations = AppLocalizations.of(context);
+    if (category == null) return localizations.semuaStatus;
     switch (category) {
-      case AktivitasType.pelanggaran: return 'Pelanggaran';
-      case AktivitasType.perizinan: return 'Perijinan';
-      case AktivitasType.kesehatan: return 'Kesehatan';
+      case AktivitasType.pelanggaran: return localizations.pelanggaran;
+      case AktivitasType.perizinan: return localizations.perizinan;
+      case AktivitasType.kesehatan: return localizations.kesehatan;
     }
   }
 }

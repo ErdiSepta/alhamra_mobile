@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:alhamra_1/core/utils/app_styles.dart';
+import 'package:alhamra_1/core/localization/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 // Enum for the type of activity
@@ -20,6 +21,18 @@ extension AktivitasTypeExtension on AktivitasType {
         return 'Perizinan';
       case AktivitasType.kesehatan:
         return 'Kesehatan';
+    }
+  }
+
+  /// Mengembalikan status text yang sudah dilocalize
+  String getStatusText(AppLocalizations localizations) {
+    switch (this) {
+      case AktivitasType.pelanggaran:
+        return localizations.statusPelanggaran;
+      case AktivitasType.perizinan:
+        return localizations.statusPerizinan;
+      case AktivitasType.kesehatan:
+        return localizations.statusKesehatan;
     }
   }
 

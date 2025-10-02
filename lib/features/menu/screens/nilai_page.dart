@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import '../../../core/data/student_data.dart';
 import '../../../core/models/nilai_model.dart';
 import '../../../core/utils/app_styles.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../shared/widgets/index.dart';
 import '../../shared/widgets/student_selection_widget.dart';
 import 'nilai_detail_page.dart';
 
 class NilaiPage extends StatefulWidget {
   const NilaiPage({super.key});
-
   @override
   State<NilaiPage> createState() => _NilaiPageState();
 }
@@ -87,7 +87,7 @@ class _NilaiPageState extends State<NilaiPage> {
           if (_isStudentOverlayVisible)
             SearchOverlayWidget(
               isVisible: _isStudentOverlayVisible,
-              title: 'Pilih Santri',
+              title: AppLocalizations.of(context).pilihSantri,
               items: StudentData.allStudents,
               selectedItem: _selectedStudentName,
               onItemSelected: (nama) {
@@ -98,7 +98,7 @@ class _NilaiPageState extends State<NilaiPage> {
                 });
               },
               onClose: () => setState(() => _isStudentOverlayVisible = false),
-              searchHint: 'Cari santri...',
+              searchHint: AppLocalizations.of(context).cariSantri,
               avatarUrl: StudentData.getStudentAvatar(_selectedStudentName),
             ),
         ],

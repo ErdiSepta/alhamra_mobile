@@ -74,8 +74,7 @@ class AktivitasListKesehatan extends StatelessWidget {
             alignment: Alignment.centerRight,
             child: ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                  context,
+                Navigator.of(context, rootNavigator: true).push(
                   MaterialPageRoute(
                     builder: (_) =>
                         AktivitasDetailPage(entry: entry, studentName: studentName),

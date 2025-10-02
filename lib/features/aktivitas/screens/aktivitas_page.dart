@@ -1,9 +1,11 @@
 import 'package:alhamra_1/features/shared/widgets/student_selection_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'dart:math';
 import '../../../core/data/student_data.dart';
 import '../../../core/models/aktivitas_model.dart';
 import '../../../core/utils/app_styles.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../shared/widgets/index.dart';
 import 'aktivitas_list_kesehatan.dart';
 import 'aktivitas_list_perizinan.dart';
@@ -28,6 +30,7 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
   late List<AktivitasEntry> _filteredEntries;
   final TextEditingController _searchController = TextEditingController();
   late TabController _tabController;
+  String? _lastLocale;
   // --- Filter State ---
   String _selectedSortOrder = 'Terbaru';
   AktivitasType? _selectedTypeFilter;
@@ -52,6 +55,7 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
       }
     });
   }
+  
 
   @override
   void dispose() {
@@ -61,11 +65,86 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
   }
 
   void _generateMockData() {
+    // Use static data for initial load to avoid context issues
     _allAktivitasData = {
       for (var student in StudentData.allStudents)
         student: StudentAktivitasProfile.createMock(
             (StudentData.allStudents.indexOf(student) + 1).toString())
     };
+  }
+  
+  void _regenerateMockDataWithLocalization() {
+    // This method can be called after context is available
+    _allAktivitasData = {
+      for (var student in StudentData.allStudents)
+        student: _createMockProfile(
+            (StudentData.allStudents.indexOf(student) + 1).toString())
+    };
+  }
+  
+  StudentAktivitasProfile _createMockProfile(String studentId) {
+    final localizations = AppLocalizations.of(context);
+    final random = Random(int.parse(studentId));
+    final now = DateTime.now();
+    final List<AktivitasEntry> mockEntries = [];
+
+    final List<String> pelanggaranJudul = [
+      localizations.terlambatApel,
+      localizations.tidakSeragam,
+      localizations.meninggalkanKelas,
+      localizations.keributan,
+    ];
+    final List<String> perizinanJudul = [
+      localizations.izinPulang,
+      localizations.izinSakit,
+      localizations.izinKeluar,
+    ];
+    final List<String> kesehatanJudul = [
+      localizations.pemeriksaanRutin,
+      localizations.sakitDemam,
+      localizations.konsultasiKesehatan,
+    ];
+    final List<String> pencatat = ['Ustadz Ahmad', 'Ustadzah Fatimah', 'Tim Kesehatan'];
+
+    for (int i = 0; i < 15; i++) {
+      final type = AktivitasType.values[random.nextInt(AktivitasType.values.length)];
+      String judul;
+      String keterangan;
+
+      switch (type) {
+        case AktivitasType.pelanggaran:
+          judul = pelanggaranJudul[random.nextInt(pelanggaranJudul.length)];
+          keterangan = 'Santri telah diberi teguran dan pembinaan oleh ${pencatat[random.nextInt(2)]}.';
+          break;
+        case AktivitasType.perizinan:
+          judul = perizinanJudul[random.nextInt(perizinanJudul.length)];
+          keterangan = 'Telah mendapat izin dari wali asrama dan akan kembali pada waktu yang ditentukan.';
+          break;
+        case AktivitasType.kesehatan:
+          judul = kesehatanJudul[random.nextInt(kesehatanJudul.length)];
+          keterangan = 'Telah diperiksa oleh tim kesehatan dan diberikan obat. Disarankan untuk istirahat.';
+          break;
+      }
+
+      mockEntries.add(
+        AktivitasEntry(
+          id: 'AKT-${studentId.padLeft(3, '0')}-${i.toString().padLeft(3, '0')}',
+          judul: judul,
+          keterangan: keterangan,
+          pencatat: pencatat[random.nextInt(pencatat.length)],
+          tanggal: now.subtract(Duration(days: random.nextInt(60), hours: random.nextInt(24))),
+          tipe: type,
+        ),
+      );
+    }
+
+    // Sort entries by date descending
+    mockEntries.sort((a, b) => b.tanggal.compareTo(a.tanggal));
+
+    return StudentAktivitasProfile(
+      studentId: studentId,
+      entries: mockEntries,
+    );
   }
 
   void _updateSelectedData() {
@@ -120,6 +199,13 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
   // --- UI Builders ---
   @override
   Widget build(BuildContext context) {
+    // Regenerate mock data only when locale changes
+    final currentLocale = Localizations.localeOf(context).toString();
+    if (_lastLocale != currentLocale) {
+      _regenerateMockDataWithLocalization();
+      _selectedProfile = _allAktivitasData[_selectedStudentName]!;
+      _lastLocale = currentLocale;
+    }
     return Scaffold(
       body: Stack(
         children: [
@@ -150,7 +236,7 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
           if (_isStudentOverlayVisible)
             SearchOverlayWidget(
               isVisible: _isStudentOverlayVisible,
-              title: 'Pilih Santri',
+              title: AppLocalizations.of(context).pilihSantri,
               items: StudentData.allStudents,
               selectedItem: _selectedStudentName,
               onItemSelected: (nama) {
@@ -161,7 +247,7 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
                 });
               },
               onClose: () => setState(() => _isStudentOverlayVisible = false),
-              searchHint: 'Cari santri...',
+              searchHint: AppLocalizations.of(context).cariSantri,
               avatarUrl: StudentData.getStudentAvatar(_selectedStudentName),
             ),
         ],
@@ -175,7 +261,7 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('Aktivitas', style: AppStyles.heading1(context)),
+          Text(AppLocalizations.of(context).aktivitas, style: AppStyles.heading1(context)),
         ],
       ),
     );
@@ -258,7 +344,7 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
             child: Row(
               children: [
                 Text(
-                  'Filter',
+                  AppLocalizations.of(context).filter,
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 14,
@@ -282,8 +368,8 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
 
   Widget _buildAktivitasList() {
     return _filteredEntries.isEmpty
-        ? const Center(
-            child: Text('Tidak ada data yang cocok.',
+        ? Center(
+            child: Text(AppLocalizations.of(context).tidakAdaData,
                 style: TextStyle(color: Colors.grey)))
         : ListView.builder(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
@@ -322,7 +408,7 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
         children: [
           // Judul Kategori
           Text(
-            "Status ${entry.tipe.label}",
+            "${AppLocalizations.of(context).status} ${_getLabelForCategory(entry.tipe)}",
             style: const TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 16,
@@ -340,7 +426,7 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("Nama Santri", style: TextStyle(color: Colors.black54, fontSize: 13)),
+                    Text(AppLocalizations.of(context).pilihSantri, style: TextStyle(color: Colors.black54, fontSize: 13)),
                     const SizedBox(height: 4),
                     Text(
                       _selectedStudentName,
@@ -354,7 +440,7 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  const Text("Tanggal", style: TextStyle(color: Colors.black54, fontSize: 13)),
+                  Text(AppLocalizations.of(context).tanggal, style: TextStyle(color: Colors.black54, fontSize: 13)),
                   const SizedBox(height: 4),
                   Text(
                     DateFormat('d MMM yyyy', 'id_ID').format(entry.tanggal),
@@ -367,7 +453,7 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
           const SizedBox(height: 12),
 
           // Judul Aktivitas
-          const Text("Aktivitas", style: TextStyle(color: Colors.black54, fontSize: 13)),
+          Text(AppLocalizations.of(context).aktivitas, style: TextStyle(color: Colors.black54, fontSize: 13)),
           const SizedBox(height: 4),
           Text(
             entry.judul,
@@ -381,8 +467,7 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
             alignment: Alignment.centerRight,
             child: ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                  context,
+                Navigator.of(context, rootNavigator: true).push(
                   MaterialPageRoute(
                     builder: (context) => AktivitasDetailPage(
                         entry: entry, studentName: _selectedStudentName),
@@ -392,13 +477,12 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppStyles.primaryColor,
                 foregroundColor: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text("Lihat Detail"),
+              child: Text(AppLocalizations.of(context).lihatDetail),
             ),
           ),
         ],
@@ -432,9 +516,9 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Filter Aktivitas', style: AppStyles.heading2(context)),
+                  Text('${AppLocalizations.of(context).filter} ${AppLocalizations.of(context).aktivitas}', style: AppStyles.heading2(context)),
                   const SizedBox(height: 24),
-                  Text('Urutkan Berdasarkan',
+                  Text(AppLocalizations.of(context).urutkanBerdasarkan,
                       style: AppStyles.bodyText(context)
                           .copyWith(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
@@ -442,12 +526,12 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
                     children: [
                       Expanded(
                           child: _buildSortButton(
-                              'Terbaru', tempSortOrder == 'Terbaru',
+                              AppLocalizations.of(context).terbaru, tempSortOrder == 'Terbaru',
                               () => setModalState(() => tempSortOrder = 'Terbaru'))),
                       const SizedBox(width: 16),
                       Expanded(
                           child: _buildSortButton(
-                              'Terlama', tempSortOrder == 'Terlama',
+                              AppLocalizations.of(context).terlama, tempSortOrder == 'Terlama',
                               () => setModalState(() => tempSortOrder = 'Terlama'))),
                     ],
                   ),
@@ -455,14 +539,14 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
                   Row(
                     children: [
                       Expanded(
-                        child: _buildDatePicker('Dari', tempStartDate,
+                        child: _buildDatePicker(AppLocalizations.of(context).dari, tempStartDate,
                             (date) => setModalState(() => tempStartDate = date),
                             onClear: () =>
                                 setModalState(() => tempStartDate = null)),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
-                        child: _buildDatePicker('Sampai', tempEndDate,
+                        child: _buildDatePicker(AppLocalizations.of(context).ke, tempEndDate,
                             (date) => setModalState(() => tempEndDate = date),
                             onClear: () =>
                                 setModalState(() => tempEndDate = null)),
@@ -481,7 +565,7 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
                               tempEndDate = null;
                             });
                           },
-                          child: const Text('Atur Ulang'),
+                          child: Text(AppLocalizations.of(context).refresh),
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -500,7 +584,7 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
                             });
                             Navigator.pop(context);
                           },
-                          child: const Text('Terapkan'),
+                          child: Text(AppLocalizations.of(context).save),
                         ),
                       ),
                     ],
@@ -596,7 +680,7 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
                   Text(
                     selectedDate != null
                         ? DateFormat('d MMM yyyy', 'id_ID').format(selectedDate)
-                        : 'Pilih tanggal',
+                        : AppLocalizations.of(context).tanggal,
                     style: AppStyles.bodyText(context).copyWith(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -657,6 +741,17 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
   }
 
   String _getLabelForCategory(AktivitasType? type) {
-    return type?.label ?? 'Semua';
+    if (type == null) {
+      return AppLocalizations.of(context).semua;
+    }
+    
+    switch (type) {
+      case AktivitasType.pelanggaran:
+        return AppLocalizations.of(context).pelanggaran;
+      case AktivitasType.perizinan:
+        return AppLocalizations.of(context).perizinan;
+      case AktivitasType.kesehatan:
+        return AppLocalizations.of(context).kesehatan;
+    }
   }
 }

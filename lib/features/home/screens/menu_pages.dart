@@ -1,6 +1,7 @@
 import '../../../features/topup/screens/topup_page.dart';
 import '../../../core/utils/app_styles.dart';
 import '../../../core/data/student_data.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../features/payment/screens/standalone_pembayaran_page.dart';
 import '../../../features/notifications/screens/pemberitahuan_page.dart';
 import '../../../core/services/notification_service.dart';
@@ -251,7 +252,7 @@ class _BerandaPageState extends State<BerandaPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Assalamualaikum,',
+                        AppLocalizations.of(context).assalamualaikum,
                         style: AppStyles.headerGreeting(context).copyWith(
                           color: _isAppBarLight ? Colors.black : Colors.white,
                         ),
@@ -575,7 +576,7 @@ class _BerandaPageState extends State<BerandaPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Pilih Menu',
+            AppLocalizations.of(context).pilihSantri,
             style: AppStyles.bodyText(context).copyWith(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -698,7 +699,7 @@ class _BerandaPageState extends State<BerandaPage> {
           ),
           const SizedBox(height: 20),
           Text(
-            'Fasilitas Pesantren',
+            AppLocalizations.of(context).fasilitas,
             style: AppStyles.bodyText(context).copyWith(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -764,7 +765,7 @@ class _BerandaPageState extends State<BerandaPage> {
                                 ),
                                 const SizedBox(height: 12),
                                 Text(
-                                  'Lihat Semua',
+                                  AppLocalizations.of(context).lihatSemua,
                                   style: AppStyles.bodyText(context).copyWith(
                                     color: AppStyles.primaryColor,
                                     fontSize: 13,
@@ -774,7 +775,7 @@ class _BerandaPageState extends State<BerandaPage> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  'Berita',
+                                  AppLocalizations.of(context).berita,
                                   style: AppStyles.bodyText(context).copyWith(
                                     color: Colors.grey[600],
                                     fontSize: 11,
@@ -862,7 +863,7 @@ class _BerandaPageState extends State<BerandaPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Berita',
+                AppLocalizations.of(context).berita,
                 style: AppStyles.bodyText(context).copyWith(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -876,7 +877,7 @@ class _BerandaPageState extends State<BerandaPage> {
                   );
                 },
                 child: Text(
-                  'Lihat Semua',
+                  AppLocalizations.of(context).lihatSemua,
                   style: AppStyles.bodyText(context).copyWith(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,

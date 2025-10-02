@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../core/utils/app_styles.dart';
 import '../../../core/models/aktivitas_model.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../screens/aktivitas_detail_page.dart';
 
 class AktivitasListAll extends StatelessWidget {
@@ -44,7 +45,7 @@ class AktivitasListAll extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Status ${entry.tipe.label}",
+          Text(entry.tipe.getStatusText(AppLocalizations.of(context)),
               style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
           const Divider(height: 24),
           Row(
@@ -66,8 +67,7 @@ class AktivitasListAll extends StatelessWidget {
             alignment: Alignment.centerRight,
             child: ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                  context,
+                Navigator.of(context, rootNavigator: true).push(
                   MaterialPageRoute(
                     builder: (_) => AktivitasDetailPage(
                       entry: entry,

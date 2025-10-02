@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/utils/app_styles.dart';
 
 class BantuanScreen extends StatelessWidget {
@@ -8,230 +9,152 @@ class BantuanScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppStyles.greyColor,
-      appBar: AppBar(
-        title: const Text('Bantuan'),
-        backgroundColor: AppStyles.primaryColor,
-        foregroundColor: Colors.white,
-      ),
-      body: SingleChildScrollView(
-        padding: AppStyles.getResponsivePadding(context),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header Time (9:41) - biasanya ini status bar, jadi bisa diabaikan
-            // atau dibuat sebagai decorative element
-            
-            // Section: Cari jawaban atau hubungi kami
-            _buildHelpSection(context),
-            
-            const SizedBox(height: 24),
-            
-            // Section: Topik Populer
-            _buildPopularTopics(context),
-            
-            const SizedBox(height: 24),
-            
-            // Section: Hubungi Kami
-            _buildContactSection(context),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHelpSection(BuildContext context) {
-    return Card(
-      elevation: 2,
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppStyles.getCardBorderRadius(context)),
-      ),
-      child: Padding(
-        padding: AppStyles.getResponsivePadding(context),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Cari jawaban atau hubungi kami',
-              style: AppStyles.bodyText(context).copyWith(
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
-              ),
-            ),
-            const SizedBox(height: 12),
-            _buildChecklistItem(context, 'Cart bantuan ...'),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPopularTopics(BuildContext context) {
-    return Card(
-      elevation: 2,
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppStyles.getCardBorderRadius(context)),
-      ),
-      child: Padding(
-        padding: AppStyles.getResponsivePadding(context),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Topik Populer',
-              style: AppStyles.bodyText(context).copyWith(
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
-              ),
-            ),
-            const SizedBox(height: 12),
-            _buildChecklistItem(context, 'Bagaimana cara mengganti kata sandi?'),
-            _buildChecklistItem(context, 'Bagaimana cara membayar tagihan?'),
-            _buildChecklistItem(context, 'Melibat Progress Tahfidz Anak'),
-            _buildChecklistItem(context, 'Apa itu Mutabalah?'),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildContactSection(BuildContext context) {
-    return Card(
-      elevation: 2,
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppStyles.getCardBorderRadius(context)),
-      ),
-      child: Padding(
-        padding: AppStyles.getResponsivePadding(context),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Hubungi Kami',
-              style: AppStyles.bodyText(context).copyWith(
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
-              ),
-            ),
-            const SizedBox(height: 12),
-            _buildContactItem(context, Icons.phone, 'Telepon : 0812xxxxxx'),
-            _buildContactItem(context, Icons.email, 'Email : info@ibsaihamra.sch.id'),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildChecklistItem(BuildContext context, String text) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
+      body: Column(
         children: [
+          // Gradient Header
           Container(
-            width: 20,
-            height: 20,
-            margin: const EdgeInsets.only(right: 12),
+            width: double.infinity,
             decoration: BoxDecoration(
-              border: Border.all(color: AppStyles.primaryColor),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: const Icon(
-              Icons.check,
-              size: 14,
-              color: Colors.transparent, // Awalnya transparan
-            ),
-          ),
-          Expanded(
-            child: Text(
-              text,
-              style: AppStyles.bodyText(context).copyWith(
-                color: Colors.grey[700],
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  AppStyles.primaryColor,
+                  AppStyles.secondaryColor,
+                ],
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildContactItem(BuildContext context, IconData icon, String text) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Icon(
-            icon,
-            size: 20,
-            color: AppStyles.primaryColor,
-          ),
-          const SizedBox(width: 12),
-          Text(
-            text,
-            style: AppStyles.bodyText(context).copyWith(
-              color: Colors.grey[700],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// Jika Anda masih ingin mempertahankan FAQ functionality, 
-// bisa dibuat sebagai screen terpisah atau dengan toggle
-class InteractiveChecklistItem extends StatefulWidget {
-  final String text;
-  final bool isInteractive;
-
-  const InteractiveChecklistItem({
-    super.key,
-    required this.text,
-    this.isInteractive = false,
-  });
-
-  @override
-  State<InteractiveChecklistItem> createState() => _InteractiveChecklistItemState();
-}
-
-class _InteractiveChecklistItemState extends State<InteractiveChecklistItem> {
-  bool _isChecked = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: widget.isInteractive ? () {
-        setState(() {
-          _isChecked = !_isChecked;
-        });
-      } : null,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Row(
-          children: [
-            Container(
-              width: 20,
-              height: 20,
-              margin: const EdgeInsets.only(right: 12),
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: _isChecked ? AppStyles.primaryColor : AppStyles.primaryColor,
+            child: SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
                 ),
-                borderRadius: BorderRadius.circular(4),
-                color: _isChecked ? AppStyles.primaryColor : Colors.transparent,
-              ),
-              child: Icon(
-                Icons.check,
-                size: 14,
-                color: _isChecked ? Colors.white : Colors.transparent,
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      onPressed: () => Navigator.pop(context),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                    const SizedBox(width: 16),
+                    Text(
+                      'Bantuan',
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontSize: AppStyles.getResponsiveFontSize(context, 
+                          small: 18.0, medium: 19.0, large: 20.0),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            Expanded(
+          ),
+          // FAQ List
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+          _buildFAQItem(
+            context,
+            'Bagaimana cara mendapatkan akun aplikasi ini?',
+            'Untuk mendapatkan akun aplikasi Alhamra, Anda perlu menghubungi pihak sekolah atau admin. Akun akan diberikan setelah santri terdaftar di sistem.',
+          ),
+          _buildFAQItem(
+            context,
+            'Saya lupa password akun saya, bagaimana cara mengatasinya?',
+            'Jika Anda lupa password, silakan hubungi admin sekolah atau gunakan fitur "Lupa Password" di halaman login. Admin akan membantu mereset password Anda.',
+          ),
+          _buildFAQItem(
+            context,
+            'Saya tidak bisa login ke aplikasi, apa penyebabnya?',
+            'Beberapa kemungkinan penyebab:\n1. Username atau password salah\n2. Koneksi internet bermasalah\n3. Akun belum diaktifkan\n4. Server sedang maintenance\n\nSilakan periksa koneksi internet Anda dan pastikan username/password benar. Jika masih bermasalah, hubungi admin.',
+          ),
+          _buildFAQItem(
+            context,
+            'Aplikasi tidak bisa dibuka atau force close (keluar sendiri)?',
+            'Coba lakukan langkah berikut:\n1. Restart aplikasi\n2. Clear cache aplikasi\n3. Update aplikasi ke versi terbaru\n4. Restart smartphone Anda\n5. Reinstall aplikasi jika masih bermasalah\n\nJika masalah berlanjut, hubungi tim support.',
+          ),
+          _buildFAQItem(
+            context,
+            'Apakah saya bisa mengganti atau membuat akun sendiri?',
+            'Tidak. Akun hanya dapat dibuat dan dikelola oleh admin sekolah. Ini untuk menjaga keamanan data dan memastikan setiap akun terhubung dengan data santri yang benar.',
+          ),
+          _buildFAQItem(
+            context,
+            'Apakah aplikasi bisa digunakan tanpa koneksi internet?',
+            'Sebagian besar fitur memerlukan koneksi internet untuk mengakses data terbaru. Namun, beberapa data yang sudah di-cache mungkin masih bisa dilihat secara offline.',
+          ),
+          _buildFAQItem(
+            context,
+            'Apakah saya boleh login di beberapa perangkat sekaligus?',
+            'Ya, Anda dapat login di beberapa perangkat. Namun, untuk keamanan, pastikan Anda logout dari perangkat yang tidak digunakan.',
+          ),
+          _buildFAQItem(
+            context,
+            'Saya mengalami kendala lain yang tidak disebutkan di atas. Apa yang harus saya lakukan?',
+            'Silakan hubungi kami melalui:\n\nTelepon: 0812-xxxx-xxxx\nEmail: info@ibsalhamra.sch.id\nWhatsApp: 0812-xxxx-xxxx\n\nTim support kami siap membantu Anda.',
+          ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFAQItem(BuildContext context, String question, String answer) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          dividerColor: Colors.transparent,
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+        ),
+        child: ExpansionTile(
+          tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          title: Text(
+            question,
+            style: GoogleFonts.poppins(
+              fontSize: AppStyles.getResponsiveFontSize(context, 
+                small: 13.0, medium: 14.0, large: 15.0),
+              fontWeight: FontWeight.w500,
+              color: AppStyles.darkGreyColor,
+              height: 1.4,
+            ),
+          ),
+          trailing: Icon(
+            Icons.keyboard_arrow_down,
+            color: AppStyles.primaryColor,
+            size: 24,
+          ),
+          children: [
+            Align(
+              alignment: Alignment.centerLeft,
               child: Text(
-                widget.text,
-                style: AppStyles.bodyText(context).copyWith(
-                  color: Colors.grey[700],
+                answer,
+                style: GoogleFonts.poppins(
+                  fontSize: AppStyles.getResponsiveFontSize(context, 
+                    small: 12.0, medium: 13.0, large: 14.0),
+                  color: AppStyles.mediumGreyColor,
+                  height: 1.6,
                 ),
               ),
             ),
