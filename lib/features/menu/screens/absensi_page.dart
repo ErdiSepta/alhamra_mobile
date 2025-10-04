@@ -304,11 +304,11 @@ class _AbsensiPageState extends State<AbsensiPage> {
             ),
             const SizedBox(width: 8),
             Text(detail.status == AttendanceStatus.izin
-                ? 'Alasan Izin'
-                : 'Keterangan Alpa'),
+                ? AppLocalizations.of(context).alasanIzin
+                : AppLocalizations.of(context).keteranganAlpa),
           ],
         ),
-        content: Text(detail.reason ?? 'Tidak ada keterangan.'),
+        content: Text(detail.reason ?? AppLocalizations.of(context).tidakAdaData),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),

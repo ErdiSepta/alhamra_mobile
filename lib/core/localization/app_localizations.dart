@@ -272,6 +272,28 @@ abstract class AppLocalizations {
   String get diproses;
   String get selesai;
   String get dibatalkan;
+  
+  // Empty States
+  String get tidakAdaTagihan;
+  String get tidakAdaPembayaran;
+  String get tidakAdaDataKesehatan;
+  String get tidakAdaDataPerizinan;
+  String get tidakAdaDataPelanggaran;
+  String get tidakAdaFasilitas;
+  String get tidakAdaJadwal;
+  String get tidakAdaDataCocok;
+  String get cobaUbahFilter;
+  String get cobaUbahKategori;
+  
+  // Detail Labels
+  String get keteranganLengkap;
+  String get keteranganAlpa;
+  String get alasanIzin;
+  String get nominalPembayaran;
+  String get saldoSetelahTransaksi;
+  String get jumlahBaris;
+  String get ustadPembimbing;
+  String get pencatat;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

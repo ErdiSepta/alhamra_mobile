@@ -458,4 +458,44 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selesai => 'Completed';
   @override
   String get dibatalkan => 'Cancelled';
+  
+  // Empty States
+  @override
+  String get tidakAdaTagihan => 'No bills';
+  @override
+  String get tidakAdaPembayaran => 'No payments';
+  @override
+  String get tidakAdaDataKesehatan => 'No health data';
+  @override
+  String get tidakAdaDataPerizinan => 'No permission data';
+  @override
+  String get tidakAdaDataPelanggaran => 'No violation data';
+  @override
+  String get tidakAdaFasilitas => 'No facilities';
+  @override
+  String get tidakAdaJadwal => 'No schedule for today';
+  @override
+  String get tidakAdaDataCocok => 'No matching data';
+  @override
+  String get cobaUbahFilter => 'Try changing filter or period';
+  @override
+  String get cobaUbahKategori => 'Try changing category or refresh page';
+  
+  // Detail Labels
+  @override
+  String get keteranganLengkap => 'Full Description';
+  @override
+  String get keteranganAlpa => 'Absence Note';
+  @override
+  String get alasanIzin => 'Permission Reason';
+  @override
+  String get nominalPembayaran => 'Payment Amount';
+  @override
+  String get saldoSetelahTransaksi => 'Balance After Transaction';
+  @override
+  String get jumlahBaris => 'Number of Lines';
+  @override
+  String get ustadPembimbing => 'Supervising Teacher';
+  @override
+  String get pencatat => 'Recorder';
 }

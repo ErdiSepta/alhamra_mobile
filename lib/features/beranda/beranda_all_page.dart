@@ -37,146 +37,46 @@ class _BerandaAllPageState extends State<BerandaAllPage> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
-    
     return Stack(
       children: [
         // Main scaffold
         Scaffold(
-          backgroundColor: AppStyles.primaryColor,
-          appBar: AppBar(
-            backgroundColor: AppStyles.primaryColor,
-            foregroundColor: Colors.white,
-            elevation: 0,
-            toolbarHeight: 140,
-            title: Column(
-              children: [
-                // Greeting section
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-                  child: Text(
-                    localizations.assalamualaikum,
-                    style: AppStyles.headerGreeting(context).copyWith(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
+          body: Column(
+            children: [
+              // Blue header section
+              Container(
+                color: AppStyles.primaryColor,
+                child: SafeArea(
+                  bottom: false,
+                  child: Column(
+                    children: [
+                      _buildHeader(),
+                      _buildStudentSelector(),
+                    ],
+                  ),
+                ),
+              ),
+              // Tab bar section
+              _buildTabBar(),
+              // White content section
+              Expanded(
+                child: Container(
+                  color: Colors.white,
+                  child: IgnorePointer(
+                    ignoring: _isStudentOverlayVisible,
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        _buildSemuaTab(),
+                        _buildKeuanganTab(),
+                        _buildKesantrianTab(),
+                        _buildAkademikTab(),
+                      ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
-                // Student selection card
-                Container(
-                  margin: const EdgeInsets.symmetric(vertical: 4),
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      // Avatar
-                      CircleAvatar(
-                        radius: 20,
-                        backgroundImage: NetworkImage(StudentData.defaultAvatarUrl),
-                        backgroundColor: Colors.grey[300],
-                      ),
-                      const SizedBox(width: 12),
-                      // Student name
-                      Expanded(
-                        child: Text(
-                          _selectedSantri,
-                          style: AppStyles.bodyText(context).copyWith(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ),
-                      // Ganti button
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _isStudentOverlayVisible = true;
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                localizations.ganti,
-                                style: AppStyles.bodyText(context).copyWith(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppStyles.primaryColor,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              Icon(
-                                Icons.arrow_forward,
-                                size: 16,
-                                color: AppStyles.primaryColor,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(48),
-              child: IgnorePointer(
-                ignoring: _isStudentOverlayVisible,
-                child: TabBar(
-                  controller: _tabController,
-                  labelColor: Colors.white,
-                  unselectedLabelColor: Colors.white.withOpacity(0.7),
-                  indicatorColor: Colors.white,
-                  indicatorWeight: 3,
-                  labelStyle: const TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                  unselectedLabelStyle: const TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.white,
-                  ),
-                  tabs: [
-                    Tab(text: localizations.semua),
-                    Tab(text: localizations.keuangan),
-                    Tab(text: localizations.kesantrian),
-                    Tab(text: localizations.akademik),
-                  ],
-                ),
               ),
-            ),
-          ),
-          body: IgnorePointer(
-            ignoring: _isStudentOverlayVisible,
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildSemuaTab(),
-                _buildKeuanganTab(),
-                _buildKesantrianTab(),
-                _buildAkademikTab(),
-              ],
-            ),
+            ],
           ),
         ),
         // Full-screen overlay untuk pemilihan santri
@@ -201,6 +101,130 @@ class _BerandaAllPageState extends State<BerandaAllPage> with SingleTickerProvid
             avatarUrl: StudentData.defaultAvatarUrl,
           ),
       ],
+    );
+  }
+
+  Widget _buildHeader() {
+    final localizations = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            localizations.beranda,
+            style: AppStyles.heading1(context),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStudentSelector() {
+    final localizations = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // Avatar
+            CircleAvatar(
+              radius: 20,
+              backgroundImage: NetworkImage(StudentData.defaultAvatarUrl),
+              backgroundColor: Colors.grey[300],
+            ),
+            const SizedBox(width: 12),
+            // Student name
+            Expanded(
+              child: Text(
+                _selectedSantri,
+                style: AppStyles.bodyText(context).copyWith(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
+            // Ganti button
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  _isStudentOverlayVisible = true;
+                });
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      localizations.ganti,
+                      style: AppStyles.bodyText(context).copyWith(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppStyles.primaryColor,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.arrow_forward,
+                      size: 16,
+                      color: AppStyles.primaryColor,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTabBar() {
+    final localizations = AppLocalizations.of(context);
+    return Container(
+      color: Colors.white,
+      child: TabBar(
+        controller: _tabController,
+        isScrollable: false,
+        indicatorColor: AppStyles.primaryColor,
+        indicatorWeight: 2,
+        labelColor: AppStyles.primaryColor,
+        unselectedLabelColor: Colors.grey[600],
+        labelPadding: EdgeInsets.zero,
+        padding: EdgeInsets.zero,
+        indicatorPadding: EdgeInsets.zero,
+        labelStyle: const TextStyle(
+          fontFamily: 'Poppins',
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: const TextStyle(
+          fontFamily: 'Poppins',
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+        ),
+        tabs: [
+          Tab(text: localizations.semua),
+          Tab(text: localizations.keuangan),
+          Tab(text: localizations.kesantrian),
+          Tab(text: localizations.akademik),
+        ],
+      ),
     );
   }
 

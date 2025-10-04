@@ -256,12 +256,19 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
   }
 
   Widget _buildHeader() {
+    final localizations = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(AppLocalizations.of(context).aktivitas, style: AppStyles.heading1(context)),
+          Text(
+            localizations.assalamualaikum,
+            style: AppStyles.headerGreeting(context).copyWith(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ],
       ),
     );
@@ -408,7 +415,7 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
         children: [
           // Judul Kategori
           Text(
-            "${AppLocalizations.of(context).status} ${_getLabelForCategory(entry.tipe)}",
+            _getStatusLabelForType(entry.tipe),
             style: const TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 16,
@@ -740,18 +747,14 @@ class _AktivitasPageState extends State<AktivitasPage> with TickerProviderStateM
     }
   }
 
-  String _getLabelForCategory(AktivitasType? type) {
-    if (type == null) {
-      return AppLocalizations.of(context).semua;
-    }
-    
+  String _getStatusLabelForType(AktivitasType type) {
     switch (type) {
       case AktivitasType.pelanggaran:
-        return AppLocalizations.of(context).pelanggaran;
+        return AppLocalizations.of(context).statusPelanggaran;
       case AktivitasType.perizinan:
-        return AppLocalizations.of(context).perizinan;
+        return AppLocalizations.of(context).statusPerizinan;
       case AktivitasType.kesehatan:
-        return AppLocalizations.of(context).kesehatan;
+        return AppLocalizations.of(context).statusKesehatan;
     }
   }
 }

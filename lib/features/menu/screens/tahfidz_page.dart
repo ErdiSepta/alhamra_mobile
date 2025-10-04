@@ -181,7 +181,7 @@ class _TahfidzPageState extends State<TahfidzPage> {
         ),
         Expanded(
           child: _filteredEntries.isEmpty
-              ? const Center(child: Text('Tidak ada data yang cocok.'))
+              ? Center(child: Text(AppLocalizations.of(context).tidakAdaDataCocok))
               : Container(
                   margin: const EdgeInsets.fromLTRB(24, 16, 24, 0),
                   decoration: BoxDecoration(
@@ -333,13 +333,13 @@ class _TahfidzPageState extends State<TahfidzPage> {
       child: Column(
         children: [
           const SizedBox(height: 16),
-          _buildDetailRow('Jumlah Baris', entry.jumlahBaris.toString()),
+          _buildDetailRow(AppLocalizations.of(context).jumlahBaris, entry.jumlahBaris.toString()),
           const SizedBox(height: 12),
-          _buildDetailRow('Keterangan', entry.keterangan),
+          _buildDetailRow(AppLocalizations.of(context).keterangan, entry.keterangan),
           const SizedBox(height: 12),
-          _buildDetailRow('Ustad Pembimbing', entry.ustadPembimbing),
+          _buildDetailRow(AppLocalizations.of(context).ustadPembimbing, entry.ustadPembimbing),
           const SizedBox(height: 12),
-          _buildDetailRow('Tanggal',
+          _buildDetailRow(AppLocalizations.of(context).tanggal,
               DateFormat('d MMMM yyyy', 'id_ID').format(entry.tanggal)),
         ],
       ),

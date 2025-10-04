@@ -654,8 +654,8 @@ class _StatusPageState extends State<StatusPage> with TickerProviderStateMixin {
   Widget _buildEmptyState() {
     return CustomEmptyStateWidget(
       icon: Icons.payment_outlined,
-      title: 'Tidak ada pembayaran',
-      subtitle: 'Coba ubah filter atau pilih tab lain',
+      title: AppLocalizations.of(context).tidakAdaPembayaran,
+      subtitle: AppLocalizations.of(context).cobaUbahFilter,
     );
   }
 

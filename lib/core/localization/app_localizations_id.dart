@@ -458,4 +458,44 @@ class AppLocalizationsId extends AppLocalizations {
   String get selesai => 'Selesai';
   @override
   String get dibatalkan => 'Dibatalkan';
+  
+  // Empty States
+  @override
+  String get tidakAdaTagihan => 'Tidak ada tagihan';
+  @override
+  String get tidakAdaPembayaran => 'Tidak ada pembayaran';
+  @override
+  String get tidakAdaDataKesehatan => 'Tidak ada data kesehatan';
+  @override
+  String get tidakAdaDataPerizinan => 'Tidak ada data perizinan';
+  @override
+  String get tidakAdaDataPelanggaran => 'Tidak ada data pelanggaran';
+  @override
+  String get tidakAdaFasilitas => 'Tidak ada fasilitas';
+  @override
+  String get tidakAdaJadwal => 'Tidak ada jadwal untuk hari ini';
+  @override
+  String get tidakAdaDataCocok => 'Tidak ada data yang cocok';
+  @override
+  String get cobaUbahFilter => 'Coba ubah filter atau periode';
+  @override
+  String get cobaUbahKategori => 'Coba ubah kategori atau refresh halaman';
+  
+  // Detail Labels
+  @override
+  String get keteranganLengkap => 'Keterangan Lengkap';
+  @override
+  String get keteranganAlpa => 'Keterangan Alpa';
+  @override
+  String get alasanIzin => 'Alasan Izin';
+  @override
+  String get nominalPembayaran => 'Nominal Pembayaran';
+  @override
+  String get saldoSetelahTransaksi => 'Saldo Setelah Transaksi';
+  @override
+  String get jumlahBaris => 'Jumlah Baris';
+  @override
+  String get ustadPembimbing => 'Ustad Pembimbing';
+  @override
+  String get pencatat => 'Pencatat';
 }

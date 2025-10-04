@@ -22,11 +22,14 @@ class AktivitasCategoryFilter extends StatelessWidget {
       color: Colors.white,
       child: TabBar(
         controller: tabController,
-        isScrollable: true,
+        isScrollable: false,
         indicatorColor: AppStyles.primaryColor,
         indicatorWeight: 2,
         labelColor: AppStyles.primaryColor,
         unselectedLabelColor: Colors.grey[600],
+        labelPadding: EdgeInsets.zero,
+        padding: EdgeInsets.zero,
+        indicatorPadding: EdgeInsets.zero,
         labelStyle: const TextStyle(
             fontFamily: 'Poppins', fontSize: 16, fontWeight: FontWeight.w600),
         unselectedLabelStyle: const TextStyle(
