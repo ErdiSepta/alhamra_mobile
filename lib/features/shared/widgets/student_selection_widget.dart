@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../core/data/student_data.dart';
-import '../../../core/localization/app_localizations.dart';
 import 'search_overlay_widget.dart';
 import 'student_selector_widget.dart';
 
@@ -11,10 +10,10 @@ class StudentSelectionWidget extends StatefulWidget {
   final List<String> students;
   final Function(String) onStudentChanged;
   final String? avatarUrl;
-  final String? buttonText;
+  final String buttonText;
   final IconData buttonIcon;
-  final String? overlayTitle;
-  final String? searchHint;
+  final String overlayTitle;
+  final String searchHint;
   final Function(bool)? onOverlayVisibilityChanged;
 
   const StudentSelectionWidget({
@@ -23,10 +22,10 @@ class StudentSelectionWidget extends StatefulWidget {
     required this.students,
     required this.onStudentChanged,
     this.avatarUrl,
-    this.buttonText,
+    this.buttonText = 'Ganti',
     this.buttonIcon = Icons.swap_horiz,
-    this.overlayTitle,
-    this.searchHint,
+    this.overlayTitle = 'Pilih Santri',
+    this.searchHint = 'Cari santri...',
     this.onOverlayVisibilityChanged,
   });
 
@@ -53,26 +52,24 @@ class _StudentSelectionWidgetState extends State<StudentSelectionWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
     return StudentSelectorWidget(
       selectedStudent: widget.selectedStudent,
       onTap: _toggleOverlay,
       avatarUrl: widget.avatarUrl,
-      buttonText: widget.buttonText ?? localizations.ganti,
+      buttonText: widget.buttonText,
       buttonIcon: widget.buttonIcon,
     );
   }
   
   Widget buildOverlay() {
-    final localizations = AppLocalizations.of(context);
     return SearchOverlayWidget(
       isVisible: _isOverlayVisible,
-      title: widget.overlayTitle ?? localizations.pilihSantri,
+      title: widget.overlayTitle,
       items: widget.students,
       selectedItem: widget.selectedStudent,
       onItemSelected: _onStudentSelected,
       onClose: _toggleOverlay,
-      searchHint: widget.searchHint ?? localizations.cariSantri,
+      searchHint: widget.searchHint,
       avatarUrl: widget.avatarUrl,
     );
   }

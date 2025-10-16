@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import '../../../core/utils/app_styles.dart';
 import '../../../core/models/bill.dart';
 import '../../../core/data/student_data.dart';
-import '../../../core/localization/app_localizations.dart';
 import '../../shared/widgets/status_app_bar.dart';
 
 class PaymentData {
@@ -148,7 +147,7 @@ class _CustomStatusMenungguPageState extends State<CustomStatusMenungguPage> {
                           
                           // Payment Details Section (Collapsible)
                           _buildCollapsibleSection(
-                            title: 'Payment Details',
+                            title: 'Detail Pembayaran',
                             isExpanded: _isPaymentDetailsExpanded,
                             onToggle: () {
                               setState(() {
@@ -246,7 +245,7 @@ class _CustomStatusMenungguPageState extends State<CustomStatusMenungguPage> {
               ),
               const SizedBox(width: 6),
               Text(
-                'Waiting for Confirmation',
+                'Menunggu Konfirmasi',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -282,13 +281,13 @@ class _CustomStatusMenungguPageState extends State<CustomStatusMenungguPage> {
       ),
       child: Column(
         children: [
-          _buildDetailRow('Invoice ID', widget.paymentData.invoiceId, isHighlight: true),
+          _buildDetailRow('ID Invoice', widget.paymentData.invoiceId, isHighlight: true),
           const SizedBox(height: 10),
-          _buildDetailRow('Sender Name', widget.paymentData.senderName),
+          _buildDetailRow('Nama Pengirim', widget.paymentData.senderName),
           const SizedBox(height: 10),
           _buildDetailRow('Administrator', widget.paymentData.administrator),
           const SizedBox(height: 10),
-          _buildDetailRow('Confirmation Date', DateFormat('dd-MM-yyyy').format(widget.paymentData.paymentDate.add(const Duration(days: 1)))),
+          _buildDetailRow('Tgl. Konfirmasi', DateFormat('dd-MM-yyyy').format(widget.paymentData.paymentDate.add(const Duration(days: 1)))),
         ],
       ),
     );
@@ -360,15 +359,15 @@ class _CustomStatusMenungguPageState extends State<CustomStatusMenungguPage> {
     return Column(
       children: [
         const SizedBox(height: 12),
-        _buildDetailRow('Payment Method', widget.paymentData.paymentMethod),
+        _buildDetailRow('Metode Pembayaran', widget.paymentData.paymentMethod),
         const SizedBox(height: 10),
         _buildDetailRow('Virtual Account', widget.paymentData.virtualAccount),
         const SizedBox(height: 10),
-        _buildDetailRow('Payment Amount', _formatCurrency(widget.paymentData.totalAmount), isHighlight: true),
+        _buildDetailRow('Nominal Pembayaran', _formatCurrency(widget.paymentData.totalAmount), isHighlight: true),
         const SizedBox(height: 10),
-        _buildDetailRow('Description', _getDetailedPaymentInfo()),
+        _buildDetailRow('Keterangan', _getDetailedPaymentInfo()),
         const SizedBox(height: 10),
-        _buildDetailRow('Student Name', widget.paymentData.studentName),
+        _buildDetailRow('Nama Santri', widget.paymentData.studentName),
       ],
     );
   }

@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/utils/app_styles.dart';
 import '../../../core/data/student_data.dart';
 import '../../../core/models/bill.dart';
-import '../../../core/localization/app_localizations.dart';
 import '../../shared/widgets/index.dart';
 import '../../shared/widgets/history_filter_widget.dart';
 import '../../shared/widgets/student_selection_widget.dart';
@@ -224,7 +223,7 @@ class _StatusPageState extends State<StatusPage> with TickerProviderStateMixin {
           if (_isStudentOverlayVisible)
             SearchOverlayWidget(
               isVisible: _isStudentOverlayVisible,
-              title: AppLocalizations.of(context).pilihSantri,
+              title: 'Pilih Santri',
               items: _students,
               selectedItem: _selectedStudent,
               onItemSelected: (student) {
@@ -238,7 +237,7 @@ class _StatusPageState extends State<StatusPage> with TickerProviderStateMixin {
                   _isStudentOverlayVisible = false;
                 });
               },
-              searchHint: AppLocalizations.of(context).cariSantri,
+              searchHint: 'Cari santri...',
               avatarUrl: StudentData.defaultAvatarUrl,
             ),
         ],
@@ -252,7 +251,7 @@ class _StatusPageState extends State<StatusPage> with TickerProviderStateMixin {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(AppLocalizations.of(context).pembayaran, style: AppStyles.heading1(context)),
+          Text('Pembayaran', style: AppStyles.heading1(context)),
         ],
       ),
     );
@@ -295,10 +294,10 @@ class _StatusPageState extends State<StatusPage> with TickerProviderStateMixin {
           _scrollListToTop();
           setState(() {});
         },
-        tabs: [
-          Tab(text: AppLocalizations.of(context).semua),
-          Tab(text: AppLocalizations.of(context).diproses),
-          Tab(text: AppLocalizations.of(context).selesai),
+        tabs: const [
+          Tab(text: 'Semua'),
+          Tab(text: 'Menunggu'),
+          Tab(text: 'Terkonfirmasi'),
         ],
       ),
     );
@@ -337,7 +336,7 @@ class _StatusPageState extends State<StatusPage> with TickerProviderStateMixin {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    AppLocalizations.of(context).filter,
+                    'Filter',
                     style: AppStyles.bodyText(context).copyWith(fontSize: 12, fontWeight: FontWeight.w500, color: AppStyles.primaryColor),
                   ),
                   const SizedBox(width: 4),
@@ -367,7 +366,7 @@ class _StatusPageState extends State<StatusPage> with TickerProviderStateMixin {
     final chipStyle = AppStyles.bodyText(context).copyWith(fontSize: 11);
     return [
       ChoiceChip(
-        label: Text(AppLocalizations.of(context).terbaru, style: chipStyle),
+        label: Text('Terbaru', style: chipStyle),
         selected: isTerbaru,
         onSelected: (v) {
           if (!isTerbaru) {
@@ -384,7 +383,7 @@ class _StatusPageState extends State<StatusPage> with TickerProviderStateMixin {
         ),
       ),
       ChoiceChip(
-        label: Text(AppLocalizations.of(context).terlama, style: chipStyle),
+        label: Text('Terlama', style: chipStyle),
         selected: !isTerbaru,
         onSelected: (v) {
           if (isTerbaru) {
@@ -482,7 +481,7 @@ class _StatusPageState extends State<StatusPage> with TickerProviderStateMixin {
       padding: const EdgeInsets.only(right: 4, bottom: 4),
       child: ActionChip(
         avatar: const Icon(Icons.clear_all, size: 14),
-        label: Text(AppLocalizations.of(context).delete, style: AppStyles.bodyText(context).copyWith(fontSize: 11, fontWeight: FontWeight.w600)),
+        label: Text('Hapus semua', style: AppStyles.bodyText(context).copyWith(fontSize: 11, fontWeight: FontWeight.w600)),
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
         onPressed: () {
@@ -654,8 +653,8 @@ class _StatusPageState extends State<StatusPage> with TickerProviderStateMixin {
   Widget _buildEmptyState() {
     return CustomEmptyStateWidget(
       icon: Icons.payment_outlined,
-      title: AppLocalizations.of(context).tidakAdaPembayaran,
-      subtitle: AppLocalizations.of(context).cobaUbahFilter,
+      title: 'Tidak ada pembayaran',
+      subtitle: 'Coba ubah filter atau pilih tab lain',
     );
   }
 
@@ -668,13 +667,13 @@ class _StatusPageState extends State<StatusPage> with TickerProviderStateMixin {
       case PaymentStatus.lunas:
         cardColor = const Color(0xFF00C896); // Green for lunas
         statusColor = const Color(0xFF00A67E);
-        statusText = AppLocalizations.of(context).lunas;
+        statusText = 'Lunas';
         break;
       case PaymentStatus.belumLunas:
       case PaymentStatus.sebagian:
         cardColor = const Color(0xFFFFC107); // Yellow for menunggu (both belumLunas and sebagian)
         statusColor = const Color(0xFFFF8F00);
-        statusText = payment.status == PaymentStatus.belumLunas ? AppLocalizations.of(context).belumLunas : AppLocalizations.of(context).sudahLunas;
+        statusText = payment.status == PaymentStatus.belumLunas ? 'Belum Lunas' : 'Terbayar Sebagian';
         break;
     }
     
@@ -699,7 +698,7 @@ class _StatusPageState extends State<StatusPage> with TickerProviderStateMixin {
               ),
             ),
             child: Text(
-              _translatePaymentType(payment.type),
+              payment.type,
               style: AppStyles.sectionTitle(context).copyWith(
                 color: Colors.white,
               ),
@@ -750,7 +749,7 @@ class _StatusPageState extends State<StatusPage> with TickerProviderStateMixin {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(AppLocalizations.of(context).namaSantri, style: AppStyles.bodyText(context).copyWith(color: Colors.grey[600], fontSize: 12)),
+                        Text('Nama Santri', style: AppStyles.bodyText(context).copyWith(color: Colors.grey[600], fontSize: 12)),
                         Text(
                           payment.studentName,
                           style: AppStyles.bodyText(context).copyWith(fontWeight: FontWeight.w500, color: Colors.black87),
@@ -761,7 +760,7 @@ class _StatusPageState extends State<StatusPage> with TickerProviderStateMixin {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          payment.status == PaymentStatus.lunas ? AppLocalizations.of(context).dikonfirmasi : AppLocalizations.of(context).tenggatBayar,
+                          payment.status == PaymentStatus.lunas ? 'Dikonfirmasi' : 'Tenggat Bayar',
                           style: AppStyles.bodyText(context).copyWith(color: Colors.grey[600], fontSize: 12),
                         ),
                         Text(
@@ -779,7 +778,7 @@ class _StatusPageState extends State<StatusPage> with TickerProviderStateMixin {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(AppLocalizations.of(context).nominalBayar, style: AppStyles.bodyText(context).copyWith(color: Colors.grey[600], fontSize: 12)),
+                        Text('Nominal Bayar', style: AppStyles.bodyText(context).copyWith(color: Colors.grey[600], fontSize: 12)),
                         Text(
                           _formatCurrency(payment.amount),
                           style: AppStyles.saldoValue(context).copyWith(fontWeight: FontWeight.w600, color: Colors.black87),
@@ -838,7 +837,7 @@ class _StatusPageState extends State<StatusPage> with TickerProviderStateMixin {
                         ),
                       ),
                       child: Text(
-                        AppLocalizations.of(context).lihatDetail,
+                        'Lihat Detail',
                         style: AppStyles.bodyText(context).copyWith(fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white),
                       ),
                     ),
@@ -858,24 +857,6 @@ class _StatusPageState extends State<StatusPage> with TickerProviderStateMixin {
 
   String _formatCurrency(int amount) {
     return 'Rp. ${amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}';
-  }
-  
-  String _translatePaymentType(String type) {
-    final localizations = AppLocalizations.of(context);
-    switch (type) {
-      case 'Uang Tahunan':
-        return localizations.uangTahunan;
-      case 'SPP Santri':
-        return localizations.sppSantri;
-      case 'Seragam':
-        return localizations.seragam;
-      case 'Uang Pembangunan':
-        return localizations.uangPembangunan;
-      case 'Uang Sumbangan':
-        return localizations.uangSumbangan;
-      default:
-        return type;
-    }
   }
 }
 

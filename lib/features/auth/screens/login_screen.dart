@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../profile/screens/bantuan_screen.dart';
 import '../../../core/utils/app_styles.dart';
@@ -264,8 +264,7 @@ class _LoginScreenState extends State<LoginScreen> {
       });
 
       if (success && mounted) {
-        Navigator.pushReplacementNamed(context, '/home'); // Navigasi ke HomeScreen
-        
+        Navigator.pushReplacementNamed(context, '/home');
       } else if (mounted) {
         showDialog(
           context: context,
@@ -380,3 +379,4 @@ class WaveClipper extends CustomClipper<Path> {
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
+

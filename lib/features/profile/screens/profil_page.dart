@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/providers/auth_provider.dart';
+import '../../auth/screens/login_screen.dart';
 import '../../../core/utils/app_styles.dart';
 import '../widgets/profile_list_tile.dart';
 
@@ -80,9 +81,9 @@ class ProfilPage extends StatelessWidget {
                   color: Colors.redAccent,
                   onTap: () {
                     Provider.of<AuthProvider>(context, listen: false).logout();
-                    // Use named route to ensure clean navigation
-                    Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
-                      '/login',
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                          builder: (context) => const LoginScreen()),
                       (Route<dynamic> route) => false,
                     );
                   },
@@ -91,7 +92,6 @@ class ProfilPage extends StatelessWidget {
             ),
     );
   }
-  
 
   Widget _buildProfileInfoRow(
     BuildContext context,

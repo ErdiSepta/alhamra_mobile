@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../core/utils/app_styles.dart';
 import '../../../core/models/bill.dart';
-import '../../../core/localization/app_localizations.dart';
 import 'detail_tagihan_page.dart';
 import '../../shared/widgets/history_filter_widget.dart';
 
@@ -197,8 +196,8 @@ class _RiwayatTagihanPageState extends State<RiwayatTagihanPage> {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
-          AppLocalizations.of(context).riwayat,
+        title: const Text(
+          'Riwayat Tagihan',
           style: TextStyle(
             color: Colors.white,
             fontSize: 18,
@@ -220,7 +219,7 @@ class _RiwayatTagihanPageState extends State<RiwayatTagihanPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  AppLocalizations.of(context).selesai,
+                  'Berhasil',
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 16,
@@ -245,7 +244,7 @@ class _RiwayatTagihanPageState extends State<RiwayatTagihanPage> {
                       child: Row(
                         children: [
                           Text(
-                            AppLocalizations.of(context).filter,
+                            'Filter',
                             style: TextStyle(
                               fontFamily: 'Poppins',
                               fontSize: 14,

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../core/models/user_model.dart';
-import 'package:alhamra_1/core/data/student_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/auth_service.dart';
 
@@ -16,8 +15,6 @@ class AuthProvider extends ChangeNotifier {
   AuthStatus _status = AuthStatus.uninitialized;
   UserModel? _user;
   String _errorMessage = '';
-  String _selectedStudent = StudentData.defaultStudent;
-  String _selectedLanguage = 'Indonesia';
   static const String _userKey = 'user_token';
 
   AuthProvider() {
@@ -28,8 +25,6 @@ class AuthProvider extends ChangeNotifier {
   bool get isAuthenticated => _status == AuthStatus.authenticated;
   UserModel? get user => _user;
   String get errorMessage => _errorMessage;
-  String get selectedStudent => _selectedStudent;
-  String get selectedLanguage => _selectedLanguage;
 
   void _checkCurrentUser() async {
     _status = AuthStatus.authenticating;
@@ -103,16 +98,5 @@ class AuthProvider extends ChangeNotifier {
     _user = null;
     notifyListeners();
   }
-
-  void selectStudent(String studentName) {
-    _selectedStudent = studentName;
-    notifyListeners();
-  }
-
-  void selectLanguage(String language) {
-    if (_selectedLanguage != language) {
-      _selectedLanguage = language;
-      notifyListeners();
-    }
-  }
 }
+

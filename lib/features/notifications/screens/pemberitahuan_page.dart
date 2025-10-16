@@ -1,14 +1,14 @@
-import 'package:alhamra_1/core/services/notification_service.dart';
 import 'package:alhamra_1/features/notifications/screens/detail_pemberitahuan_page.dart';
-import 'package:alhamra_1/features/shared/widgets/status_app_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../core/utils/app_styles.dart';
+import '../../shared/widgets/custom_app_bar.dart';
+import '../../../core/services/notification_service.dart';
 import '../../../core/models/notification_model.dart';
-import '../../../core/localization/app_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class PemberitahuanPage extends StatefulWidget {
   const PemberitahuanPage({super.key});
+
   @override
   State<PemberitahuanPage> createState() => _PemberitahuanPageState();
 }
@@ -44,7 +44,7 @@ class _PemberitahuanPageState extends State<PemberitahuanPage> {
       ),
       child: Scaffold(
         backgroundColor: const Color(0xFF2196F3),
-        appBar: StatusAppBar(
+        appBar: CustomAppBar(
           title: 'Pemberitahuan',
           backgroundColor: Colors.transparent,
           actions: [
@@ -127,7 +127,7 @@ class _PemberitahuanPageState extends State<PemberitahuanPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    AppLocalizations.of(context).filter,
+                    'Filter',
                     style: GoogleFonts.poppins(
                       color: AppStyles.primaryColor,
                       fontWeight: FontWeight.w600,
@@ -285,7 +285,7 @@ class _PemberitahuanPageState extends State<PemberitahuanPage> {
             borderRadius: BorderRadius.circular(16),
           ),
           child: Text(
-            'Approved',
+            'Disetujui',
             style: GoogleFonts.poppins(
               color: const Color(0xFF4CAF50),
               fontSize: 12,
@@ -301,7 +301,7 @@ class _PemberitahuanPageState extends State<PemberitahuanPage> {
             borderRadius: BorderRadius.circular(16),
           ),
           child: Text(
-            'Waiting',
+            'Menunggu',
             style: GoogleFonts.poppins(
               color: const Color(0xFFFF9800),
               fontSize: 12,
@@ -317,7 +317,7 @@ class _PemberitahuanPageState extends State<PemberitahuanPage> {
             borderRadius: BorderRadius.circular(16),
           ),
           child: Text(
-            'Rejected',
+            'Ditolak',
             style: GoogleFonts.poppins(
               color: const Color(0xFFF44336),
               fontSize: 12,
@@ -333,7 +333,7 @@ class _PemberitahuanPageState extends State<PemberitahuanPage> {
             borderRadius: BorderRadius.circular(16),
           ),
           child: Text(
-            'Read',
+            'Dibaca',
             style: GoogleFonts.poppins(
               color: Colors.grey.shade600,
               fontSize: 12,
@@ -349,7 +349,7 @@ class _PemberitahuanPageState extends State<PemberitahuanPage> {
             borderRadius: BorderRadius.circular(16),
           ),
           child: Text(
-            'New',
+            'Baru',
             style: GoogleFonts.poppins(
               color: const Color(0xFF1976D2),
               fontSize: 12,
@@ -393,7 +393,7 @@ class _PemberitahuanPageState extends State<PemberitahuanPage> {
           ),
           const SizedBox(height: 16),
           Text(
-            'No notifications',
+            'Tidak ada pemberitahuan',
             style: GoogleFonts.poppins(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -402,7 +402,7 @@ class _PemberitahuanPageState extends State<PemberitahuanPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Notifications will appear here',
+            'Pemberitahuan akan muncul di sini',
             style: GoogleFonts.poppins(
               fontSize: 14,
               fontWeight: FontWeight.w400,
@@ -524,7 +524,7 @@ class _PemberitahuanPageState extends State<PemberitahuanPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Filter Notifications',
+                        'Filter Pemberitahuan',
                         style: GoogleFonts.poppins(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
@@ -543,7 +543,7 @@ class _PemberitahuanPageState extends State<PemberitahuanPage> {
                   
                   // Sort Order Section
                   Text(
-                    'Sort by Time',
+                    'Urutkan Berdasarkan Waktu',
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -588,7 +588,7 @@ class _PemberitahuanPageState extends State<PemberitahuanPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'From',
+                              'Dari',
                               style: GoogleFonts.poppins(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
@@ -614,7 +614,7 @@ class _PemberitahuanPageState extends State<PemberitahuanPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'To',
+                              'Sampai',
                               style: GoogleFonts.poppins(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
@@ -659,7 +659,7 @@ class _PemberitahuanPageState extends State<PemberitahuanPage> {
                             ),
                           ),
                           child: Text(
-                            'Reset',
+                            'Atur Ulang',
                             style: GoogleFonts.poppins(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -687,7 +687,7 @@ class _PemberitahuanPageState extends State<PemberitahuanPage> {
                             ),
                           ),
                           child: Text(
-                            'Apply',
+                            'Terapkan',
                             style: GoogleFonts.poppins(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,

@@ -1,9 +1,6 @@
 import 'package:alhamra_1/features/home/screens/menu_pages.dart';
-import 'package:alhamra_1/features/aktivitas/screens/aktivitas_page.dart';
-import 'package:alhamra_1/features/beranda/beranda_all_page.dart';
 import 'package:alhamra_1/features/payment/screens/bayar_pages.dart';
-import 'package:alhamra_1/features/profile/screens/profile_page.dart';
-import 'package:alhamra_1/core/localization/app_localizations.dart';
+import 'package:alhamra_1/features/profile/screens/profil_page.dart';
 
 import '../../../core/utils/app_styles.dart';
 import 'package:flutter/material.dart';
@@ -52,19 +49,24 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
-    // Set default to index 2 (Beranda - BerandaAllPage)
+    // Set default to index 0 (Menu - first item)
     PersistentTabController controller = PersistentTabController(
-      initialIndex: 2,
+      initialIndex: 0,
     );
 
     List<Widget> buildScreens() {
       return [
         const BerandaPage(), // Menu (shows Beranda content)
         const StatusPage(), // Status
-        const BerandaAllPage(), // Beranda (center) - Now using the new overview page
-        const AktivitasPage(), // Aktivitas
-        ProfilePage(), // Akun
+        const PlaceholderPage(
+          title: 'Beranda',
+          icon: Icons.home,
+        ), // Beranda (center)
+        const PlaceholderPage(
+          title: 'Aktivitas',
+          icon: Icons.local_activity,
+        ), // Aktivitas
+        ProfilPage(), // Akun
       ];
     }
 
@@ -73,7 +75,7 @@ class HomeScreen extends StatelessWidget {
         // Menu
         PersistentBottomNavBarItem(
           icon: const Icon(Icons.menu, size: 26),
-          title: localizations.menu,
+          title: "Menu",
           activeColorPrimary: AppStyles.primaryColor,
           inactiveColorPrimary: const Color(0xFFAAAAAA),
           textStyle: GoogleFonts.poppins(
@@ -84,7 +86,7 @@ class HomeScreen extends StatelessWidget {
         // Status
         PersistentBottomNavBarItem(
           icon: const Icon(Icons.history_outlined, size: 26),
-          title: localizations.status,
+          title: "Status",
           activeColorPrimary: AppStyles.primaryColor,
           inactiveColorPrimary: const Color(0xFFAAAAAA),
           textStyle: GoogleFonts.poppins(
@@ -95,7 +97,7 @@ class HomeScreen extends StatelessWidget {
         // Beranda (Center - Default)
         PersistentBottomNavBarItem(
           icon: const Icon(Icons.home, size: 26),
-          title: localizations.beranda,
+          title: "Beranda",
           activeColorPrimary: AppStyles.primaryColor,
           inactiveColorPrimary: const Color(0xFFAAAAAA),
           textStyle: GoogleFonts.poppins(
@@ -106,7 +108,7 @@ class HomeScreen extends StatelessWidget {
         // Aktivitas
         PersistentBottomNavBarItem(
           icon: const Icon(Icons.local_activity, size: 26),
-          title: localizations.aktivitas,
+          title: "Aktivitas",
           activeColorPrimary: AppStyles.primaryColor,
           inactiveColorPrimary: const Color(0xFFAAAAAA),
           textStyle: GoogleFonts.poppins(
@@ -117,7 +119,7 @@ class HomeScreen extends StatelessWidget {
         // Akun
         PersistentBottomNavBarItem(
           icon: const Icon(Icons.person_outline, size: 26),
-          title: localizations.akun,
+          title: "Akun",
           activeColorPrimary: AppStyles.primaryColor,
           inactiveColorPrimary: const Color(0xFFAAAAAA),
           textStyle: GoogleFonts.poppins(

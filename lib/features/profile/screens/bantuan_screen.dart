@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../core/utils/app_styles.dart';
 
 class BantuanScreen extends StatelessWidget {
@@ -9,158 +8,151 @@ class BantuanScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppStyles.greyColor,
-      body: Column(
-        children: [
-          // Gradient Header
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  AppStyles.primaryColor,
-                  AppStyles.secondaryColor,
-                ],
-              ),
-            ),
-            child: SafeArea(
-              bottom: false,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 16,
-                ),
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
-                    const SizedBox(width: 16),
-                    Text(
-                      'Bantuan',
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontSize: AppStyles.getResponsiveFontSize(context, 
-                          small: 18.0, medium: 19.0, large: 20.0),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+      appBar: AppBar(
+        title: const Text('Bantuan'),
+        backgroundColor: AppStyles.primaryColor,
+        foregroundColor: Colors.white,
+      ),
+      body: ListView(
+        padding: AppStyles.getResponsivePadding(context),
+        children: const [
+          FaqItem(
+            question: 'Bagaimana cara mendapatkan akun aplikasi ini?',
+            answer:
+                '1. Akun untuk masuk ke aplikasi IBS Al-Hamra tidak dibuat secara mandiri oleh pengguna.\n'
+                '2. Setiap username dan password hanya bisa diberikan oleh administrator resmi aplikasi.\n'
+                '3. Jika Anda belum menerima akun, silakan hubungi admin melalui WhatsApp di nomor berikut: 0894-8347-387',
           ),
-          // FAQ List
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-          _buildFAQItem(
-            context,
-            'Bagaimana cara mendapatkan akun aplikasi ini?',
-            'Untuk mendapatkan akun aplikasi Alhamra, Anda perlu menghubungi pihak sekolah atau admin. Akun akan diberikan setelah santri terdaftar di sistem.',
+          FaqItem(
+            question:
+                'Saya lupa password akun saya, bagaimana cara mengatasinya?',
+            answer:
+                'Jika Anda tidak bisa mengingat password, tidak tersedia fitur reset otomatis di aplikasi ini. Untuk melakukan reset password, silakan hubungi langsung admin melalui WhatsApp: 0894-8347-387. Sebutkan nama lengkap Anda dan instansi/unit terkait agar proses verifikasi berjalan cepat.',
           ),
-          _buildFAQItem(
-            context,
-            'Saya lupa password akun saya, bagaimana cara mengatasinya?',
-            'Jika Anda lupa password, silakan hubungi admin sekolah atau gunakan fitur "Lupa Password" di halaman login. Admin akan membantu mereset password Anda.',
+          FaqItem(
+            question: 'Saya tidak bisa login ke aplikasi, apa penyebabnya?',
+            answer:
+                'Ada beberapa hal yang perlu diperiksa:\n'
+                '1. Pastikan Anda menggunakan username dan password yang benar, sesuai dengan yang diberikan oleh admin.\n'
+                '2. Periksa apakah Anda tidak mengaktifkan caps lock, dan perhatikan huruf besar/kecil.\n'
+                '3. Pastikan perangkat Anda terhubung dengan internet.\n'
+                '4. Jika semua sudah benar namun tetap gagal, segera hubungi admin di 0894-8347-387.',
           ),
-          _buildFAQItem(
-            context,
-            'Saya tidak bisa login ke aplikasi, apa penyebabnya?',
-            'Beberapa kemungkinan penyebab:\n1. Username atau password salah\n2. Koneksi internet bermasalah\n3. Akun belum diaktifkan\n4. Server sedang maintenance\n\nSilakan periksa koneksi internet Anda dan pastikan username/password benar. Jika masih bermasalah, hubungi admin.',
+          FaqItem(
+            question:
+                'Aplikasi tidak bisa dibuka atau force close (keluar sendiri)?',
+            answer:
+                'Ada beberapa hal yang perlu diperiksa:\n'
+                '1. Tutup aplikasi dan buka ulang.\n'
+                '2. Restart perangkat Anda.\n'
+                '3. Pastikan aplikasi IBS Al-Hamra sudah diperbarui ke versi terbaru.\n'
+                '4. Jika masih bermasalah, coba hapus cache aplikasi di pengaturan perangkat.',
           ),
-          _buildFAQItem(
-            context,
-            'Aplikasi tidak bisa dibuka atau force close (keluar sendiri)?',
-            'Coba lakukan langkah berikut:\n1. Restart aplikasi\n2. Clear cache aplikasi\n3. Update aplikasi ke versi terbaru\n4. Restart smartphone Anda\n5. Reinstall aplikasi jika masih bermasalah\n\nJika masalah berlanjut, hubungi tim support.',
+          FaqItem(
+            question: 'Apakah saya bisa mengganti atau membuat akun sendiri?',
+            answer:
+                'Tidak bisa. Seluruh akun hanya dibuat oleh administrator pusat untuk menjaga keamanan sistem dan data pengguna. Jika Anda membutuhkan akses baru (misalnya karena pindah unit atau ganti perangkat), silakan ajukan ke admin 0894-8347-387.',
           ),
-          _buildFAQItem(
-            context,
-            'Apakah saya bisa mengganti atau membuat akun sendiri?',
-            'Tidak. Akun hanya dapat dibuat dan dikelola oleh admin sekolah. Ini untuk menjaga keamanan data dan memastikan setiap akun terhubung dengan data santri yang benar.',
+          FaqItem(
+            question: 'Apakah aplikasi bisa digunakan tanpa koneksi internet?',
+            answer:
+                'Tidak. Aplikasi IBS Al-Hamra membutuhkan koneksi internet aktif untuk login dan mengakses data. Pastikan Anda terhubung dengan jaringan yang stabil saat menggunakan aplikasi.',
           ),
-          _buildFAQItem(
-            context,
-            'Apakah aplikasi bisa digunakan tanpa koneksi internet?',
-            'Sebagian besar fitur memerlukan koneksi internet untuk mengakses data terbaru. Namun, beberapa data yang sudah di-cache mungkin masih bisa dilihat secara offline.',
+          FaqItem(
+            question: 'Apakah saya boleh login di beberapa perangkat sekaligus?',
+            answer:
+                'Sangat tidak disarankan. Untuk menjaga keamanan dan konsistensi data, sebaiknya Anda hanya login di satu perangkat saja. Jika ingin mengganti perangkat, logout terlebih dahulu dari perangkat sebelumnya, lalu login ulang di perangkat baru.',
           ),
-          _buildFAQItem(
-            context,
-            'Apakah saya boleh login di beberapa perangkat sekaligus?',
-            'Ya, Anda dapat login di beberapa perangkat. Namun, untuk keamanan, pastikan Anda logout dari perangkat yang tidak digunakan.',
-          ),
-          _buildFAQItem(
-            context,
-            'Saya mengalami kendala lain yang tidak disebutkan di atas. Apa yang harus saya lakukan?',
-            'Silakan hubungi kami melalui:\n\nTelepon: 0812-xxxx-xxxx\nEmail: info@ibsalhamra.sch.id\nWhatsApp: 0812-xxxx-xxxx\n\nTim support kami siap membantu Anda.',
-          ),
-              ],
-            ),
+          FaqItem(
+            question:
+                'Saya mengalami kendala lain yang tidak disebutkan di atas. Apa yang harus saya lakukan?',
+            answer:
+                'Jika ada masalah atau pertanyaan lain yang belum terjawab, silakan langsung hubungi admin melalui WhatsApp: 0894-8347-387. Tim admin siap membantu Anda selama jam kerja.',
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildFAQItem(BuildContext context, String question, String answer) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
+class FaqItem extends StatefulWidget {
+  final String question;
+  final String answer;
+
+  const FaqItem({
+    super.key,
+    required this.question,
+    required this.answer,
+  });
+
+  @override
+  State<FaqItem> createState() => _FaqItemState();
+}
+
+class _FaqItemState extends State<FaqItem> {
+  bool _isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final answerParts = widget.answer.split('\n').where((s) => s.isNotEmpty).toList();
+
+    return Card(
+      elevation: 2,
+      margin: EdgeInsets.symmetric(
+        vertical: AppStyles.getResponsiveSpacing(context, small: 6.0, medium: 7.0, large: 8.0),
       ),
-      child: Theme(
-        data: Theme.of(context).copyWith(
-          dividerColor: Colors.transparent,
-          splashColor: Colors.transparent,
-          highlightColor: Colors.transparent,
-        ),
-        child: ExpansionTile(
-          tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-          title: Text(
-            question,
-            style: GoogleFonts.poppins(
-              fontSize: AppStyles.getResponsiveFontSize(context, 
-                small: 13.0, medium: 14.0, large: 15.0),
-              fontWeight: FontWeight.w500,
-              color: AppStyles.darkGreyColor,
-              height: 1.4,
-            ),
-          ),
-          trailing: Icon(
-            Icons.keyboard_arrow_down,
-            color: AppStyles.primaryColor,
-            size: 24,
-          ),
-          children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                answer,
-                style: GoogleFonts.poppins(
-                  fontSize: AppStyles.getResponsiveFontSize(context, 
-                    small: 12.0, medium: 13.0, large: 14.0),
-                  color: AppStyles.mediumGreyColor,
-                  height: 1.6,
-                ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppStyles.getCardBorderRadius(context)),
+      ),
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            _isExpanded = !_isExpanded;
+          });
+        },
+        child: Padding(
+          padding: AppStyles.getResponsivePadding(context),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      widget.question,
+                      style: AppStyles.bodyText(context).copyWith(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  Icon(
+                    _isExpanded ? Icons.expand_less : Icons.expand_more,
+                    color: AppStyles.primaryColor,
+                  ),
+                ],
               ),
-            ),
-          ],
+              if (_isExpanded) ...[
+                const SizedBox(height: 12.0),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: answerParts.map((part) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Text(
+                        part,
+                        style: AppStyles.bodyText(context).copyWith(
+                          color: Colors.grey[700],
+                          height: 1.5,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ],
+          ),
         ),
       ),
     );
   }
 }
+
