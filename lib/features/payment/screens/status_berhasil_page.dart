@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../core/utils/app_styles.dart';
+import '../../../core/localization/app_localizations.dart';
 import 'package:flutter/services.dart';
 import '../../shared/widgets/status_app_bar.dart';
 
@@ -13,7 +14,7 @@ class StatusBerhasilPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: StatusAppBar(
-        title: 'Seragam Santri',
+        title: 'Uniform',
         onBackPressed: () => Navigator.pop(context),
       ),
       body: SingleChildScrollView(
@@ -63,7 +64,7 @@ class StatusBerhasilPage extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'Pembayaran Berhasil',
+                            'Payment Successful',
                             style: AppStyles.bodyText(context).copyWith(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
@@ -121,7 +122,7 @@ class StatusBerhasilPage extends StatelessWidget {
                       ),
                       child: ExpansionTile(
                         title: Text(
-                          'Detail Pembayaran',
+                          'Payment Details',
                           style: AppStyles.bodyText(context).copyWith(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -160,7 +161,7 @@ class StatusBerhasilPage extends StatelessWidget {
                               onPressed: () => _sharePaymentStatus(),
                               icon: const Icon(Icons.share, size: 20),
                               label: Text(
-                                'Bagikan',
+                                'Share',
                                 style: AppStyles.bodyText(context).copyWith(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
@@ -198,7 +199,7 @@ class StatusBerhasilPage extends StatelessWidget {
                                 elevation: 0,
                               ),
                               child: Text(
-                                'Kembali',
+                                'Back',
                                 style: AppStyles.bodyText(context).copyWith(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,

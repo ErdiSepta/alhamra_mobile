@@ -303,105 +303,106 @@ class _OnboardScreenState extends State<OnboardScreen> {
     required String title,
     required String description,
   }) {
+    // Calculate available height for content
+    final availableHeight = constraints.maxHeight;
+    final imageSize = availableHeight * 0.25; // 25% of available height
+    final topSpacing = availableHeight * 0.08; // 8% for top spacing
+    final bottomSpacing = availableHeight * 0.20; // 20% for bottom controls
+    
     return SingleChildScrollView(
-      child: Padding(
-        padding: AppStyles.getResponsivePadding(context),
-        child: Column(
-          children: [
-            SizedBox(height: constraints.maxHeight * 0.12),
-            Text(
-              title,
-              style: GoogleFonts.poppins(
-                color: Colors.white,
-                fontSize: AppStyles.getResponsiveFontSize(
-                  context,
-                  small: 22.0,
-                  medium: 24.0,
-                  large: 26.0,
-                ),
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(
-              height: AppStyles.getResponsiveSpacing(
-                context,
-                small: 20.0,
-                medium: 22.0,
-                large: 15.0,
-              ),
-            ),
-            Container(
-              height: AppStyles.getImageSize(
-                context,
-                small: 200.0,
-                medium: 220.0,
-                large: 250.0,
-              ),
-              width: AppStyles.getImageSize(
-                context,
-                small: 220.0,
-                medium: 250.0,
-                large: 275.0,
-              ),
-              clipBehavior: Clip.antiAlias,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 20,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minHeight: constraints.maxHeight,
+        ),
+        child: IntrinsicHeight(
+          child: Padding(
+            padding: AppStyles.getResponsivePadding(context),
+            child: Column(
+              children: [
+                SizedBox(height: topSpacing),
+                Text(
+                  title,
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontSize: AppStyles.getResponsiveFontSize(
+                      context,
+                      small: 20.0,
+                      medium: 24.0,
+                      large: 26.0,
+                    ),
+                    fontWeight: FontWeight.bold,
                   ),
-                ],
-              ),
-              child: Center(
-                child: Image.asset(
-                  imagePath,
-                  height: AppStyles.getImageSize(
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(
+                  height: AppStyles.getResponsiveSpacing(
                     context,
-                    small: 240.0,
-                    medium: 270.0,
-                    large: 280.0,
+                    small: 16.0,
+                    medium: 20.0,
+                    large: 24.0,
                   ),
-                  fit: BoxFit.contain,
                 ),
-              ),
-            ),
-            SizedBox(
-              height: AppStyles.getResponsiveSpacing(
-                context,
-                small: 40.0,
-                medium: 45.0,
-                large: 50.0,
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: AppStyles.getResponsiveSpacing(
-                  context,
-                  small: 32.0,
-                  medium: 36.0,
-                  large: 40.0,
+                Container(
+                  height: imageSize.clamp(150.0, 250.0),
+                  width: imageSize.clamp(150.0, 250.0),
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 20,
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Image.asset(
+                      imagePath,
+                      height: imageSize.clamp(150.0, 250.0) * 1.1,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
                 ),
-              ),
-              child: Text(
-                description,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
-                  color: Colors.grey.shade700,
-                  fontSize: AppStyles.getResponsiveFontSize(
+                SizedBox(
+                  height: AppStyles.getResponsiveSpacing(
                     context,
-                    small: 13.0,
-                    medium: 14.0,
-                    large: 15.0,
+                    small: 24.0,
+                    medium: 32.0,
+                    large: 40.0,
                   ),
-                  fontWeight: FontWeight.w500,
-                  height: 1.6,
                 ),
-              ),
+                Flexible(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppStyles.getResponsiveSpacing(
+                        context,
+                        small: 24.0,
+                        medium: 32.0,
+                        large: 40.0,
+                      ),
+                    ),
+                    child: Text(
+                      description,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                        color: Colors.grey.shade700,
+                        fontSize: AppStyles.getResponsiveFontSize(
+                          context,
+                          small: 12.0,
+                          medium: 14.0,
+                          large: 15.0,
+                        ),
+                        fontWeight: FontWeight.w500,
+                        height: 1.5,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: bottomSpacing),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

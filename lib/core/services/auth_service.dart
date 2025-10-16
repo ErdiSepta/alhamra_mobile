@@ -1,8 +1,12 @@
+import 'dart:convert';
 import '../../../core/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'odoo_api_service.dart';
 
 class AuthService {
-  // Static user data for testing
+  final OdooApiService _odooApi = OdooApiService();
+  
+  // Static user data for testing (fallback)
   static final List<Map<String, dynamic>> _staticUsers = [
     {
       'uid': 'user_001',
@@ -12,7 +16,6 @@ class AuthService {
       'alamatLengkap': 'Jl. Merdeka No. 123, Jakarta',
       'emailPengguna': 'ahmad@example.com',
       'password': 'flutte',
-      
     },
     {
       'uid': 'user_002',
@@ -22,7 +25,6 @@ class AuthService {
       'alamatLengkap': 'Jl. Sudirman No. 456, Bandung',
       'emailPengguna': 'siti@example.com',
       'password': 'password456',
-      
     },
     {
       'uid': 'user_003',
@@ -32,57 +34,112 @@ class AuthService {
       'alamatLengkap': 'Jl. Gatot Subroto No. 789, Surabaya',
       'emailPengguna': 'budi@example.com',
       'password': 'password789',
-      
     },
   ];
 
   String? _currentUserId;
+  UserModel? _currentUserData;
   static const String _currentUserKey = 'current_user_id';
+  static const String _currentUserDataKey = 'current_user_data';
+  
+  // PENTING: Set ke true untuk menggunakan Odoo API
+  // Set ke false untuk testing dengan data static
+  static const bool _useOdooApi = true;
 
-  // Sign in with email and password using static data
+  // Sign in with email and password
   Future<UserCredential?> signInWithEmailAndPassword(
       String email, String password) async {
-    // Simulate network delay
-    await Future.delayed(const Duration(milliseconds: 500));
     
-    try {
-      final userData = _staticUsers.firstWhere(
-        (user) => user['emailPengguna'] == email && user['password'] == password,
-      );
+    if (_useOdooApi) {
+      // Login menggunakan Odoo API
+      try {
+        final result = await _odooApi.login(email, password);
+        
+        // Create user model from Odoo response
+        _currentUserData = UserModel.fromOdoo(result);
+        _currentUserId = _currentUserData!.uid;
+        
+        // Save user data to SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(_currentUserKey, _currentUserId!);
+        await prefs.setString(_currentUserDataKey, 
+          jsonEncode(_currentUserData!.toMap()));
+        
+        return UserCredential(_currentUserId!);
+      } catch (e) {
+        if (e is OdooException) {
+          throw 'Login gagal: ${e.message}';
+        }
+        throw 'Koneksi ke server gagal. Pastikan Anda terhubung ke internet.';
+      }
+    } else {
+      // Fallback to static data for testing
+      await Future.delayed(const Duration(milliseconds: 500));
       
-      _currentUserId = userData['uid'];
-      
-      // Save current user ID to SharedPreferences
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_currentUserKey, userData['uid']);
-      
-      await updateLastLogin(userData['uid']);
-      
-      return UserCredential(userData['uid']);
-    } catch (e) {
-      throw 'Email dan password tidak terdaftar';
+      try {
+        final userData = _staticUsers.firstWhere(
+          (user) => user['emailPengguna'] == email && user['password'] == password,
+        );
+        
+        _currentUserId = userData['uid'];
+        _currentUserData = UserModel.fromMap(userData, userData['uid']);
+        
+        // Save current user ID to SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(_currentUserKey, userData['uid']);
+        await prefs.setString(_currentUserDataKey, 
+          jsonEncode(_currentUserData!.toMap()));
+        
+        await updateLastLogin(userData['uid']);
+        
+        return UserCredential(userData['uid']);
+      } catch (e) {
+        throw 'Email dan password tidak terdaftar';
+      }
     }
   }
 
-  // Get user data from static data
+  // Get user data
   Future<UserModel?> getUserData(String uid) async {
-    // Simulate network delay
-    await Future.delayed(const Duration(milliseconds: 300));
-    
-    try {
-      final userData = _staticUsers.firstWhere(
-        (user) => user['uid'] == uid,
-      );
-      
-      return UserModel.fromMap(userData, uid);
-    } catch (e) {
-      return null;
+    // Return cached user data if available
+    if (_currentUserData != null && _currentUserData!.uid == uid) {
+      return _currentUserData;
     }
+    
+    // Try to get from SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+    final userDataJson = prefs.getString(_currentUserDataKey);
+    
+    if (userDataJson != null) {
+      try {
+        final userData = jsonDecode(userDataJson) as Map<String, dynamic>;
+        _currentUserData = UserModel.fromMap(userData, uid);
+        return _currentUserData;
+      } catch (e) {
+        // Failed to parse, continue to fallback
+      }
+    }
+    
+    // Fallback to static data
+    if (!_useOdooApi) {
+      await Future.delayed(const Duration(milliseconds: 300));
+      
+      try {
+        final userData = _staticUsers.firstWhere(
+          (user) => user['uid'] == uid,
+        );
+        
+        return UserModel.fromMap(userData, uid);
+      } catch (e) {
+        return null;
+      }
+    }
+    
+    return null;
   }
 
-  // Update last login timestamp (simulate)
+  // Update last login timestamp
   Future<void> updateLastLogin(String uid) async {
-    // Simulate network delay
     await Future.delayed(const Duration(milliseconds: 200));
     
     try {
@@ -97,11 +154,17 @@ class AuthService {
 
   // Sign out
   Future<void> signOut() async {
-    _currentUserId = null;
+    if (_useOdooApi) {
+      await _odooApi.logout();
+    }
     
-    // Remove current user ID from SharedPreferences
+    _currentUserId = null;
+    _currentUserData = null;
+    
+    // Remove current user data from SharedPreferences
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_currentUserKey);
+    await prefs.remove(_currentUserDataKey);
   }
 
   // Get current user
@@ -116,6 +179,16 @@ class AuthService {
   Future<void> initializeCurrentUser() async {
     final prefs = await SharedPreferences.getInstance();
     _currentUserId = prefs.getString(_currentUserKey);
+    
+    final userDataJson = prefs.getString(_currentUserDataKey);
+    if (userDataJson != null) {
+      try {
+        final userData = jsonDecode(userDataJson) as Map<String, dynamic>;
+        _currentUserData = UserModel.fromMap(userData, _currentUserId ?? '');
+      } catch (e) {
+        // Failed to parse user data
+      }
+    }
   }
 }
 

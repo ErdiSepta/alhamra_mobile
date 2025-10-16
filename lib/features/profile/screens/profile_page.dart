@@ -7,6 +7,7 @@ import 'package:alhamra_1/features/profile/screens/ubah_kata_sandi_page.dart';
 import 'package:alhamra_1/features/profile/screens/informasi_aplikasi_page.dart';
 import 'package:alhamra_1/features/profile/screens/ketentuan_layanan_page.dart';
 import 'package:alhamra_1/features/shared/widgets/language_switcher.dart';
+import 'package:alhamra_1/features/shared/widgets/user_avatar.dart';
 import 'package:alhamra_1/core/utils/app_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -135,14 +136,7 @@ class ProfilePage extends StatelessWidget {
       ),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 30,
-            backgroundColor: AppStyles.primaryColor.withOpacity(0.1),
-            child: Text(
-              currentUser?.fullName.substring(0, 2).toUpperCase() ?? 'AK',
-              style: const TextStyle(color: AppStyles.primaryColor, fontWeight: FontWeight.bold, fontSize: 20),
-            ),
-          ),
+          UserAvatar(user: currentUser, radius: 30),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
@@ -153,6 +147,12 @@ class ProfilePage extends StatelessWidget {
                   style: AppStyles.bodyText(context).copyWith(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
                 const SizedBox(height: 4),
+                Text(
+                  currentUser?.email ?? 'email@example.com',
+                  style: AppStyles.bodyText(context).copyWith(color: Colors.grey[600], fontSize: 12),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
                 Text(
                   '${localizations.anakYangDipilih}: $selectedStudent',
                   style: AppStyles.bodyText(context).copyWith(color: Colors.grey[600], fontSize: 13),

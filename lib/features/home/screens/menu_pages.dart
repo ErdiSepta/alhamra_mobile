@@ -1,6 +1,7 @@
 import '../../../features/topup/screens/topup_page.dart';
 import '../../../core/utils/app_styles.dart';
 import '../../../core/data/student_data.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../features/payment/screens/standalone_pembayaran_page.dart';
 import '../../../features/notifications/screens/pemberitahuan_page.dart';
 import '../../../core/services/notification_service.dart';
@@ -13,6 +14,14 @@ import '../../news/screens/news_list_screen.dart';
 import '../../news/screens/news_detail_screen.dart';
 import '../../../core/services/news_service.dart';
 import '../../../core/models/article_model.dart';
+import '../../menu/screens/info_akademik_page.dart';
+import '../../menu/screens/absensi_page.dart';
+import '../../menu/screens/nilai_page.dart';
+import '../../menu/screens/tahfidz_page.dart';
+import '../../menu/screens/tahsin_page.dart';
+import '../../menu/screens/mutabaah_page.dart';
+import '../../menu/screens/perizinan_page.dart';
+import '../../menu/screens/profile_santri.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -243,7 +252,7 @@ class _BerandaPageState extends State<BerandaPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Assalamualaikum,',
+                        AppLocalizations.of(context).assalamualaikum,
                         style: AppStyles.headerGreeting(context).copyWith(
                           color: _isAppBarLight ? Colors.black : Colors.white,
                         ),
@@ -567,7 +576,7 @@ class _BerandaPageState extends State<BerandaPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Pilih Menu',
+            AppLocalizations.of(context).pilihSantri,
             style: AppStyles.bodyText(context).copyWith(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -590,8 +599,8 @@ class _BerandaPageState extends State<BerandaPage> {
                 label: 'Profil Santri',
                 color: Colors.blue,
                 onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Fitur Profil Santri akan segera hadir')),
+                  Navigator.of(context, rootNavigator: true).push(
+                    MaterialPageRoute(builder: (context) => const ProfileSantriPage()),
                   );
                 },
               ),
@@ -603,8 +612,8 @@ class _BerandaPageState extends State<BerandaPage> {
                 label: 'Info Akademik',
                 color: Colors.blue,
                 onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Fitur Info Akademik akan segera hadir')),
+                  Navigator.of(context, rootNavigator: true).push(
+                    MaterialPageRoute(builder: (context) => const InfoAkademikPage()),
                   );
                 },
               ),
@@ -616,8 +625,8 @@ class _BerandaPageState extends State<BerandaPage> {
                 label: 'Absensi',
                 color: Colors.blue,
                 onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Fitur Absensi akan segera hadir')),
+                  Navigator.of(context, rootNavigator: true).push(
+                    MaterialPageRoute(builder: (context) => const AbsensiPage()),
                   );
                 },
               ),
@@ -629,8 +638,8 @@ class _BerandaPageState extends State<BerandaPage> {
                 label: 'Nilai Akademik',
                 color: Colors.blue,
                 onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Fitur Nilai Akademik akan segera hadir')),
+                  Navigator.of(context, rootNavigator: true).push(
+                    MaterialPageRoute(builder: (context) => const NilaiPage()),
                   );
                 },
               ),
@@ -642,8 +651,8 @@ class _BerandaPageState extends State<BerandaPage> {
                 label: 'Tahfidz Qur\'an',
                 color: Colors.blue,
                 onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Fitur Tahfidz Qur\'an akan segera hadir')),
+                  Navigator.of(context, rootNavigator: true).push(
+                    MaterialPageRoute(builder: (context) => const TahfidzPage()),
                   );
                 },
               ),
@@ -655,8 +664,8 @@ class _BerandaPageState extends State<BerandaPage> {
                 label: 'Tahsin',
                 color: Colors.blue,
                 onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Fitur Tahsin akan segera hadir')),
+                  Navigator.of(context, rootNavigator: true).push(
+                    MaterialPageRoute(builder: (context) => const TahsinPage()),
                   );
                 },
               ),
@@ -668,8 +677,8 @@ class _BerandaPageState extends State<BerandaPage> {
                 label: 'Mutabaah',
                 color: Colors.blue,
                 onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Fitur Mutabaah akan segera hadir')),
+                  Navigator.of(context, rootNavigator: true).push(
+                    MaterialPageRoute(builder: (context) => const MutabaahPage()),
                   );
                 },
               ),
@@ -681,8 +690,8 @@ class _BerandaPageState extends State<BerandaPage> {
                 label: 'Formulir Perijinan',
                 color: Colors.blue,
                 onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Fitur Formulir Perijinan akan segera hadir')),
+                  Navigator.of(context, rootNavigator: true).push(
+                    MaterialPageRoute(builder: (context) => const PerizinanPage()),
                   );
                 },
               ),
@@ -690,7 +699,7 @@ class _BerandaPageState extends State<BerandaPage> {
           ),
           const SizedBox(height: 20),
           Text(
-            'Fasilitas Pesantren',
+            AppLocalizations.of(context).fasilitas,
             style: AppStyles.bodyText(context).copyWith(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -756,7 +765,7 @@ class _BerandaPageState extends State<BerandaPage> {
                                 ),
                                 const SizedBox(height: 12),
                                 Text(
-                                  'Lihat Semua',
+                                  AppLocalizations.of(context).lihatSemua,
                                   style: AppStyles.bodyText(context).copyWith(
                                     color: AppStyles.primaryColor,
                                     fontSize: 13,
@@ -766,7 +775,7 @@ class _BerandaPageState extends State<BerandaPage> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  'Berita',
+                                  AppLocalizations.of(context).berita,
                                   style: AppStyles.bodyText(context).copyWith(
                                     color: Colors.grey[600],
                                     fontSize: 11,
@@ -854,7 +863,7 @@ class _BerandaPageState extends State<BerandaPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Berita',
+                AppLocalizations.of(context).berita,
                 style: AppStyles.bodyText(context).copyWith(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -868,7 +877,7 @@ class _BerandaPageState extends State<BerandaPage> {
                   );
                 },
                 child: Text(
-                  'Lihat Semua',
+                  AppLocalizations.of(context).lihatSemua,
                   style: AppStyles.bodyText(context).copyWith(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,

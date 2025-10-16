@@ -2,6 +2,7 @@ import 'package:alhamra_1/features/payment/widgets/bill_card.dart';
 
 import '../../../core/utils/app_styles.dart';
 import '../../../core/models/bill.dart';
+import '../../../core/localization/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'pembayaran_flow_bsi.dart';
 
@@ -377,9 +378,9 @@ class _StandalonePembayaranPageState extends State<StandalonePembayaranPage> {
             child: const Icon(Icons.inbox_outlined, size: 48, color: Colors.grey),
           ),
           const SizedBox(height: 12),
-          Text('Tidak ada tagihan', style: AppStyles.bodyText(context).copyWith(fontWeight: FontWeight.w600)),
+          Text(AppLocalizations.of(context).tidakAdaTagihan, style: AppStyles.bodyText(context).copyWith(fontWeight: FontWeight.w600)),
           const SizedBox(height: 4),
-          Text('Coba ubah filter atau periode', style: AppStyles.bodyText(context).copyWith(color: Colors.black54)),
+          Text(AppLocalizations.of(context).cobaUbahFilter, style: AppStyles.bodyText(context).copyWith(color: Colors.black54)),
         ],
       ),
     );

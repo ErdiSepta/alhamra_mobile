@@ -2,13 +2,12 @@ import 'package:alhamra_1/core/providers/auth_provider.dart';
 import 'package:alhamra_1/core/utils/app_styles.dart';
 import 'package:alhamra_1/features/shared/widgets/custom_button.dart';
 import 'package:alhamra_1/features/shared/widgets/custom_textfield.dart';
+import 'package:alhamra_1/features/shared/widgets/user_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
-
-  @override
   State<EditProfilePage> createState() => _EditProfilePageState();
 }
 
@@ -108,40 +107,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Widget _buildProfilePictureEditor(BuildContext context) {
-    return Stack(
-      alignment: Alignment.bottomRight,
-      children: [
-        CircleAvatar(
-          radius: 50,
-          backgroundColor: AppStyles.primaryColor.withOpacity(0.1),
-          child: const Icon(
-            Icons.person,
-            size: 50,
-            color: AppStyles.primaryColor,
-          ),
-          // backgroundImage: NetworkImage('URL_GAMBAR_PENGGUNA'), // Jika ada
-        ),
-        GestureDetector(
-          onTap: () {
-            // TODO: Implementasi logika untuk memilih gambar
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Fitur ganti gambar belum tersedia.')),
-            );
-          },
-          child: Container(
-            padding: const EdgeInsets.all(6),
-            decoration: const BoxDecoration(
-              color: AppStyles.primaryColor,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.camera_alt,
-              color: Colors.white,
-              size: 18,
-            ),
-          ),
-        ),
-      ],
+    final user = Provider.of<AuthProvider>(context).user;
+    
+    return UserAvatar(
+      user: user,
+      radius: 50,
+      showEditButton: true,
+      onEditTap: () {
+        // TODO: Implementasi logika untuk memilih gambar
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Fitur ganti gambar belum tersedia.')),
+        );
+      },
     );
   }
 
